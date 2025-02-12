@@ -1,9 +1,41 @@
+<!DOCTYPE html> 
+<html>
+<head> 
+<style> 
+@keyframes slideIn { 
+  from {
+    margin-left: 100%;
+  } 
+  to {
+    margin-left: 0%;
+  } 
+}
+
+.animated-text { 
+  width: 100%; 
+  background-color: red; 
+  animation-name: example; 
+  animation-duration: 4s; 
+  animation-iteration-count: infinite; 
+  animation-direction: alternate; 
+}
+
+.slide-in-text { 
+  width: 100%; 
+  margin-left: 100%; 
+  animation: slideIn 2s forwards; 
+  } 
+</style> 
+</head> 
+<body>
+</body> 
+</html>
 <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
 
 <div class="content">
   <div class="content__container">
     <p class="content__container__text">
-       I like programming in
+       <p5 class="slide-in-text">I like programming in</p5>
     </p>
     
     <ul class="content__container__list">
@@ -135,3 +167,4 @@
     83.3%, 95.96% {transform:translate3d(0,-25%,0);}
   }
 </style>
+
