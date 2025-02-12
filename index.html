@@ -90,52 +90,51 @@
     text-align: left;
     list-style: none;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    gap: 10px; /* Ruimte tussen de items */
     height: 40px;
-    position: relative;
     width: 100%;
-    overflow: hidden;
+    position: relative;
   }
 
   .content__container__list__item {
     line-height: 40px;
     margin: 0;
-    position: absolute; /* Zorgt ervoor dat de items elkaar niet overlappen */
+    position: absolute; /* Zorgt ervoor dat ze zich overlappen */
     opacity: 0; /* Begin als onzichtbaar */
-    animation: fadeInOut 10s infinite;
-  }
-
-  /* De animatie voor het tonen van items */
-  @keyframes fadeInOut {
-    0%, 100% {
-      opacity: 0; /* Item is onzichtbaar aan het begin en einde */
-      transform: translateY(100%); /* Begin buiten het scherm */
-    }
-    10%, 30% {
-      opacity: 1; /* Item wordt zichtbaar */
-      transform: translateY(0); /* Het beweegt naar de normale positie */
-    }
-    70%, 90% {
-      opacity: 0; /* Item verdwijnt */
-      transform: translateY(-100%); /* Het beweegt naar boven */
-    }
+    transition: opacity 1s; /* Aangepaste overgang voor het zichtbaar maken */
   }
 
   /* Geef de lijstitems verschillende vertragingen */
   .content__container__list__item:nth-child(1) {
+    animation: fadeInOut 10s infinite;
     animation-delay: 0s;
   }
 
   .content__container__list__item:nth-child(2) {
+    animation: fadeInOut 10s infinite;
     animation-delay: 2.5s; /* De tijdsvertraging voor het 2e item */
   }
 
   .content__container__list__item:nth-child(3) {
+    animation: fadeInOut 10s infinite;
     animation-delay: 5s; /* De tijdsvertraging voor het 3e item */
   }
 
   .content__container__list__item:nth-child(4) {
+    animation: fadeInOut 10s infinite;
     animation-delay: 7.5s; /* De tijdsvertraging voor het 4e item */
+  }
+
+  @keyframes fadeInOut {
+    0%, 100% {
+      opacity: 0; /* Item is onzichtbaar aan het begin en einde */
+    }
+    10%, 30% {
+      opacity: 1; /* Item wordt zichtbaar */
+    }
+    70%, 90% {
+      opacity: 0; /* Item verdwijnt */
+    }
   }
 </style>
