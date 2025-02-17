@@ -1,24 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 20px;
-    }
-    ::-webkit-scrollbar-track {
-      box-shadow: inset 0 0 5px grey;
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #16a085;
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #16a170;
-    }
-
     /* Algemene body styling */
     body {
       width: 100%;
@@ -27,6 +11,52 @@
       margin: 0;
       padding: 0;
       font-family: 'Lato', sans-serif;
+      overflow: auto; /* Zorgt ervoor dat de pagina scrollbaar blijft */
+    }
+
+    /* Geanimeerde achtergrond */
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3498db 25%, #2ecc71 50%, #9b59b6 75%);
+      background-size: 300% 300%;
+      animation: waveAnimation 10s ease-in-out infinite;
+      z-index: -1; /* Zorg ervoor dat de achtergrond achter de inhoud ligt */
+    }
+
+    /* Animatie voor de bewegende golven */
+    @keyframes waveAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 5px grey;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #16a085;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #16a170;
     }
 
     /* Animaties voor de tekst */
@@ -137,6 +167,9 @@
       width: 350px;
       height: 200px;
       margin-top: 1000px; /* Laat de container onderaan het scherm verschijnen */
+      opacity: 0; /* Verberg de container aanvankelijk */
+      transform: translateX(100%); /* Plaats de container rechts buiten het scherm */
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Animaties voor het 'poppen' effect */
     }
 
     .dialogue {
@@ -168,10 +201,14 @@
 </head>
 <body>
 
+  <!-- Geanimeerde achtergrond -->
+  <div class="background"></div>
+
+  <!-- Inhoud van de pagina -->
   <div class="content">
     <div class="content__container">
       <p class="content__container__text">
-        <p5 class="slide-in-text">I like programming in</p5>
+        <span class="slide-in-text">&nbsp I like programming in</span>
       </p>
       <ul class="content__container__list">
         <li class="content__container__list__item">Python !</li>
@@ -182,18 +219,43 @@
     </div>
   </div>
 
-<center>
-  <!-- Dialoog container, direct onderaan het scherm -->
-  <div class="container" id="dialogue-container">
-    <div class="top-panel">
-      <strong>WesMeer</strong>
-      <button><strong>X</strong></button>
+  <center>
+    <!-- Dialoog container, direct onderaan het scherm -->
+    <div class="container" id="dialogue-container">
+      <div class="top-panel">
+        <strong>WesMeer</strong>
+        <button id="close-button"><strong>X</strong></button>
+      </div>
+      <div class="dialogue">
+        <p class="text;" style="text-align:start;">👋 Hi, I am Wes!</p>
+        <p class="text;" style="text-align:start;">🌍 I am from the Netherlands</p>
+      </div>
     </div>
-    <div class="dialogue">
-      <p class="text;" style="text-align:start;">👋 Hi, I am Wes!</p>
-	  <p class="text;" style="text-align:start;">🌍 I am from the Netherlands</p>
-    </div>
-  </div>
-</center>
+  </center>
+
+  <script>
+    // JavaScript voor de 'X' knop
+    document.getElementById('close-button').addEventListener('click', function() {
+      // Verander de tekst in de dialoogbox wanneer op 'X' wordt geklikt
+      const dialogue = document.querySelector('.dialogue');
+      dialogue.innerHTML = '<p style="text-align:start;">✨ And I like Easter Eggs, so here is one! ✨</p>';
+    });
+
+    // Gebruik IntersectionObserver om de dialoogbox te laten poppen als deze in beeld komt
+    const dialogueContainer = document.getElementById('dialogue-container');
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Wanneer de dialoog in beeld komt, speel de animatie af
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'translateX(0)'; // Maak de dialoog zichtbaar en laat het van rechts komen
+          observer.unobserve(entry.target); // Stop met observeren zodra de animatie heeft plaatsgevonden
+        }
+      });
+    }, { threshold: 0.5 }); // Kijk of het element voor 50% zichtbaar is
+
+    observer.observe(dialogueContainer); // Start de observatie
+  </script>
+
 </body>
 </html>
