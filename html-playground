@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Playground</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+    /* Linker paneel: de code textbox */
+    #left-panel {
+      width: 50%;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+    }
+    /* Rechter paneel: de knop en preview */
+    #right-panel {
+      width: 50%;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    #code-input {
+      width: 100%;
+      height: calc(100vh - 20px);
+      font-family: monospace;
+      font-size: 14px;
+      padding: 10px;
+      resize: none;
+    }
+    #run-btn {
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    #preview {
+      flex-grow: 1;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow: auto;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Linker kolom: code textbox -->
+  <div id="left-panel">
+    <textarea id="code-input">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Example</title>
+  <style>
+    body { background-color: #f0f0f0; font-family: sans-serif; }
+    h1 { color: darkblue; }
+  </style>
+</head>
+<body>
+  <h1>Hello, world!</h1>
+  <p>Welcome in the Html Playground.</p>
+</body>
+</html>
+    </textarea>
+  </div>
+
+  <!-- Rechter kolom: knop en preview -->
+  <div id="right-panel">
+    <button id="run-btn">Run Code</button>
+    <div id="preview"></div>
+  </div>
+
+  <script>
+    // Functie om de preview bij te werken met de code uit de textarea
+    function updatePreview() {
+      var code = document.getElementById('code-input').value;
+      document.getElementById('preview').innerHTML = code;
+    }
+
+    // Update de preview wanneer op de knop wordt geklikt
+    document.getElementById('run-btn').addEventListener('click', updatePreview);
+
+    // Update de preview automatisch als de pagina laadt
+    window.addEventListener('load', updatePreview);
+  </script>
+</body>
+</html>
