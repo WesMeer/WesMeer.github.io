@@ -12,34 +12,25 @@
     </style>
 </head>
 <body>
-    <pre id="ascii-art">
-    </pre>
+    <pre id="ascii-art"></pre>
     <script>
-        const frames = [
-            `      
-             /\\_/\\
-            ( o.o )
-             > ^ <`,
-            `      
-             /\\_/\\
-            ( -.- )
-             > ^ <`,
-            `      
-             /\\_/\\
-            ( o.o )
-             > ^ <`
-        ];
+        fetch('frames-curl-ascii.json')
+            .then(response => response.json())
+            .then(data => {
+                const frames = data.frames;
+                const interval = data.interval;
+                let index = 0;
+                const preElement = document.getElementById("ascii-art");
 
-        let index = 0;
-        const preElement = document.getElementById("ascii-art");
+                function animateASCII() {
+                    preElement.textContent = frames[index];
+                    index = (index + 1) % frames.length;
+                    setTimeout(animateASCII, interval);
+                }
 
-        function animateASCII() {
-            preElement.textContent = frames[index];
-            index = (index + 1) % frames.length;
-            setTimeout(animateASCII, 500); // Verander de snelheid hier (500 ms)
-        }
-
-        animateASCII();
+                animateASCII();
+            })
+            .catch(error => console.error('Error loading JSON:', error));
     </script>
 </body>
 </html>
