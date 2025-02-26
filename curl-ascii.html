@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewegende ASCII Animatie</title>
+    <style>
+        pre {
+            font-family: monospace;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <pre id="ascii-art">
+    </pre>
+    <script>
+        const frames = [
+            `      
+             /\\_/\\
+            ( o.o )
+             > ^ <`,
+            `      
+             /\\_/\\
+            ( -.- )
+             > ^ <`,
+            `      
+             /\\_/\\
+            ( o.o )
+             > ^ <`
+        ];
+
+        let index = 0;
+        const preElement = document.getElementById("ascii-art");
+
+        function animateASCII() {
+            preElement.textContent = frames[index];
+            index = (index + 1) % frames.length;
+            setTimeout(animateASCII, 500); // Verander de snelheid hier (500 ms)
+        }
+
+        animateASCII();
+    </script>
+</body>
+</html>
