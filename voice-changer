@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Stemvervormer</title>
+  <style>
+    /* Basis styling: zwarte achtergrond, gecentreerd */
+    body {
+      margin: 0;
+      background-color: #000; /* Zwarte achtergrond */
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    h1 {
+      color: #fff;
+      font-size: 2.5em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: #fff;
+      text-align: center;
+    }
+    
+    /* Startknop styling */
+    #start {
+      padding: 20px 40px;
+      font-size: 18px;
+      background-color: #0078d7;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 120, 215, 0.5);
+      /* Overgangen voor breedte, hoogte, padding, border-radius, transform en opacity */
+      transition: width 0.7s ease, height 0.7s ease, padding 0.7s ease, border-radius 0.7s ease, transform 0.7s ease, opacity 0.7s ease;
+      position: relative;
+    }
+    #start:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(0, 120, 215, 0.8);
+    }
+    /* In loading state: tekst verdwijnt direct en de knop transformeert naar een vaste cirkel */
+    #start.loading {
+      width: 60px;
+      height: 60px;
+      padding: 0;
+      border-radius: 50%;
+      color: transparent; /* Tekst wordt direct onzichtbaar */
+      pointer-events: none;
+    }
+    #start.loading::after {
+      content: "";
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      margin-top: -20px;
+      margin-left: -20px;
+      border: 4px solid #0078d7;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    /* Verberg de startknop wanneer volledig getransformeerd */
+    #start.hide {
+      opacity: 0;
+      transform: scale(0.9);
+      pointer-events: none;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Container voor de presets: initieel onzichtbaar, met vloeiende overgang */
+    #preset-buttons {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      margin-top: 20px;
+    }
+    #preset-buttons.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Container voor preset-knoppen naast elkaar */
+    #preset-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    /* Stijl voor de preset-knoppen */
+    button.preset-btn {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 16px;
+      border: none;
+      background-color: #0078d7;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 120, 215, 0.5);
+      transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      width: 200px;
+    }
+    button.preset-btn:hover {
+      background-color: #005a9e;
+      transform: translateY(-5px);
+      box-shadow: 0 0 20px rgba(0, 120, 215, 0.8);
+    }
+    button.preset-btn.active {
+      background-color: #34c759;
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(52,199,89,0.8);
+    }
+  </style>
+</head>
+<body>
+  <!-- Startknop zichtbaar initieel -->
+  <button id="start">🎙️ Start Microfoon</button>
+  
+  <!-- Preset-knoppen container, initieel onzichtbaar -->
+  <div id="preset-buttons">
+    <h2>🎛️ Presets</h2>
+    <div id="preset-container">
+      <button id="normal" class="preset-btn">🔊 Normale Stem</button>
+      <button id="chipmunk" class="preset-btn">🐿️ Chipmunk</button>
+      <button id="robot" class="preset-btn">🤖 Robot</button>
+      <button id="demon" class="preset-btn">👹 Demon</button>
+      <button id="alien" class="preset-btn">👽 Alien</button>
+      <button id="echo" class="preset-btn">🌊 Echo</button>
+      <button id="tiny-radio" class="preset-btn">📻 Tiny Radio</button>
+    </div>
+  </div>
+  
+  <script>
+    let audioContext, mediaStreamSource, biquadFilter, delayNode, feedbackGain, mainGain;
+    let activeButton = null;
+    
+    const startButton = document.getElementById('start');
+    const presetButtons = document.getElementById('preset-buttons');
+    
+    startButton.addEventListener('click', async () => {
+      // Zet de startknop in loading state zodat de tekst onmiddellijk weg is en de knop transformeert
+      startButton.classList.add('loading');
+      
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        setupAudio(stream);
+        await audioContext.suspend();
+        console.log("AudioContext suspended: geen output tot een preset wordt gekozen.");
+  
+        // Wacht 700ms zodat de transitie compleet is, en switch dan naar presets
+        setTimeout(() => {
+          startButton.classList.remove('loading');
+          startButton.classList.add('hide');
+          presetButtons.classList.add('show');
+        }, 700);
+      } catch (err) {
+        console.error("Microfoon toegang geweigerd", err);
+        alert("Geef toestemming voor de microfoon om de stemvervormer te gebruiken.");
+        // Als toegang wordt geweigerd, verwijder de loading state zodat de knop opnieuw zichtbaar is
+        startButton.classList.remove('loading');
+      }
+    });
+    
+    function setupAudio(stream) {
+      mediaStreamSource = audioContext.createMediaStreamSource(stream);
+      biquadFilter = audioContext.createBiquadFilter();
+      delayNode = audioContext.createDelay();
+      feedbackGain = audioContext.createGain();
+      mainGain = audioContext.createGain();
+  
+      delayNode.connect(feedbackGain);
+      feedbackGain.connect(delayNode);
+      delayNode.connect(mainGain);
+      mainGain.connect(audioContext.destination);
+  
+      mediaStreamSource.connect(biquadFilter).connect(delayNode);
+      resetAudio();
+    }
+    
+    function resetAudio() {
+      biquadFilter.type = "allpass";
+      biquadFilter.frequency.setValueAtTime(1000, audioContext.currentTime);
+      delayNode.delayTime.setValueAtTime(0, audioContext.currentTime);
+      feedbackGain.gain.setValueAtTime(0, audioContext.currentTime);
+      mainGain.gain.setValueAtTime(0, audioContext.currentTime);
+    }
+    
+    async function activatePreset(settingsCallback, buttonId) {
+      resetAudio();
+      settingsCallback();
+      await audioContext.resume();
+      mainGain.gain.cancelScheduledValues(audioContext.currentTime);
+      mainGain.gain.setValueAtTime(0, audioContext.currentTime);
+      mainGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.05);
+      highlightButton(buttonId);
+    }
+    
+    function highlightButton(buttonId) {
+      if (activeButton) {
+        activeButton.classList.remove('active');
+      }
+      activeButton = document.getElementById(buttonId);
+      activeButton.classList.add('active');
+    }
+    
+    // Preset event listeners:
+    document.getElementById('normal').addEventListener('click', async () => {
+      await activatePreset(() => {}, 'normal');
+      console.log("Normale stem actief.");
+    });
+    document.getElementById('chipmunk').addEventListener('click', async () => {
+      await activatePreset(() => {
+        biquadFilter.type = "highpass";
+        biquadFilter.frequency.setValueAtTime(1500, audioContext.currentTime);
+      }, 'chipmunk');
+      console.log("Chipmunk preset actief.");
+    });
+    document.getElementById('robot').addEventListener('click', async () => {
+      await activatePreset(() => {
+        biquadFilter.type = "peaking";
+        biquadFilter.frequency.setValueAtTime(1200, audioContext.currentTime);
+        delayNode.delayTime.setValueAtTime(0.01, audioContext.currentTime);
+        feedbackGain.gain.setValueAtTime(0.6, audioContext.currentTime);
+      }, 'robot');
+      console.log("Robot preset actief.");
+    });
+    document.getElementById('demon').addEventListener('click', async () => {
+      await activatePreset(() => {
+        biquadFilter.type = "lowpass";
+        biquadFilter.frequency.setValueAtTime(150, audioContext.currentTime);
+        delayNode.delayTime.setValueAtTime(0.1, audioContext.currentTime);
+        feedbackGain.gain.setValueAtTime(0.4, audioContext.currentTime);
+        mainGain.gain.setValueAtTime(1.2, audioContext.currentTime);
+      }, 'demon');
+      console.log("Demon preset actief.");
+    });
+    document.getElementById('alien').addEventListener('click', async () => {
+      await activatePreset(() => {
+        biquadFilter.type = "bandpass";
+        biquadFilter.frequency.setValueAtTime(600, audioContext.currentTime);
+        delayNode.delayTime.setValueAtTime(0.04, audioContext.currentTime);
+        feedbackGain.gain.setValueAtTime(0.5, audioContext.currentTime);
+      }, 'alien');
+      console.log("Alien preset actief.");
+    });
+    document.getElementById('echo').addEventListener('click', async () => {
+      await activatePreset(() => {
+        biquadFilter.type = "bandpass";
+        biquadFilter.frequency.setValueAtTime(800, audioContext.currentTime);
+        delayNode.delayTime.setValueAtTime(0.2, audioContext.currentTime);
+        feedbackGain.gain.setValueAtTime(0.4, audioContext.currentTime);
+      }, 'echo');
+      console.log("Echo preset actief.");
+    });
+    document.getElementById('tiny-radio').addEventListener('click', async () => {
+      await activatePreset(() => {
+        biquadFilter.type = "highpass";
+        biquadFilter.frequency.setValueAtTime(2000, audioContext.currentTime);
+        mainGain.gain.setValueAtTime(0.8, audioContext.currentTime);
+      }, 'tiny-radio');
+      console.log("Tiny Radio preset actief.");
+    });
+  </script>
+</body>
+</html>
