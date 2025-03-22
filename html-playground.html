@@ -5,6 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Code Playground</title>
   <style>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.loading-text {
+  margin-top: 30px; /* Zorgt voor afstand tussen de loader en de tekst */
+  font-size: 1.5em;
+  color: #ffffff;
+  text-align: center;
+  animation: fade 1.5s infinite;
+}
+
+@keyframes fade {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
     * {
       box-sizing: border-box;
     }
@@ -52,6 +84,16 @@
   </style>
 </head>
 <body>
+  <div class="loading-overlay" id="loading-screen">
+  <div class="loader">
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+  </div>
+  <p class="loading-text">Loading...</p>
+</div>
   <!-- Linker kolom: code textbox -->
   <div id="left-panel">
     <textarea id="code-input">
@@ -91,5 +133,14 @@
     // Update de preview automatisch als de pagina laadt
     window.addEventListener('load', updatePreview);
   </script>
+<script>
+  window.addEventListener('load', function() {
+    const loadingScreen = document.getElementById('loading-screen');
+    setTimeout(() => {
+      loadingScreen.classList.add('hidden');
+    }, 1000); // Houd het laadscherm 1 seconde zichtbaar
+  });
+</script>
+
 </body>
 </html>
