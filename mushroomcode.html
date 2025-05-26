@@ -81,3 +81,45 @@ section .wave span:nth-child(3) {
 	<p>BEHINDTHESCREEN</p>
   </div>
 </section>
+
+<!-- Voeg dit in je <body> toe -->
+<a href="https://discord.gg/kutsCgAjTt" class="discord-float" target="_blank" aria-label="Join our Discord">
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC/klEQVR4nO2Yy29MURzH25LxSJqohjZq3VAlqHQhUV0RURUsasVCSLoTknokNuIPwLBqI/GIBQkiFUvPGCQdDBKa0OggRFVQYlAfOfKb5PT23Ofcae7E/SQ3mdw5v+/vfO899zx+ZWUxMTExMaUEUA/sALqBNPAFuA6Ue4gtB65JTFo0lFb9RHW+DjgA9DOWHHAbOAJUedCZARyWGBWr81xy1BXDwGzgGPBDS6h+nwU2AJUFaFeKhtKy6h9XucMy0Qa81xIMA3uBaku7RmAbkAR6gafS9rdcw3KvV9qotgssGtWirdrmUbnbCjWxHPipiSb1oQMsk6c2SHAG5W03abpVck9/O81BTUySJ5jnF5CQ/1YD9wmfe8AqyZGQN5nnAVARxMgWQyI109yk+NwCbhjudwQxkiF6pP2aaCG6NPsxcpro0uPVxFTgM9HlEzDFi5GNRJ91XoycIfqcdDNRYVnFo8o7x80psJTSYZGTkT0BBO8Ai9UHCCwBUkWKsbLbychl/PEwv23RNNTW4lHIMSYuOBl5SwizB7A+5BgTWTsTc/GP8awAzAo5xo45JqF2/FNj06makGPsGH9OAXbhn/YAwyRIjB07TULqgOQXuw83E3KMHUmTkasEIyXrj9qjNQF3ixRj4orJyBNKj4zJyCtKjwGTkY8OAX/kzDw6gZ0clUVS5bZjyGTEWijT6ZY2Kw3FuWLQD7RKzh6HdjmTkT6HgMdArbSbLOXNbBEMZIHtKofkqnX5dvtMRuYDIw5BH6Sy8m/7LBu+TcAllzg3vgIX5UCX0GrDW9XQcYmbN86ICKz10Ck133foNSZZB1qBLuCETK8vpCM5uYbkXkradMlQTVhqaZs9rCnKxBqjCU1MzesDHp7ka+AosCJQ4WzsYa5FtN54yPtSrUFexacDh4BvHoS/Aw0FGGkQDTfUSDkITAuSRBWV90up347OoCa0PJ0O+s+AfcDMQvPkky1UmzTgvMzvI65FAH/6p0RTaZ+TXI1h6cfExMTExPwX/AUSwnsiWoemtQAAAABJRU5ErkJggg==" alt="Discord" />
+</a>
+
+<!-- Voeg dit in je <style> of een CSS-bestand toe -->
+<style>
+.discord-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #5865F2;
+  color: white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: float 2s ease-in-out infinite;
+}
+.discord-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+.discord-float img {
+  width: 30px;
+  height: 30px;
+}
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+</style>
