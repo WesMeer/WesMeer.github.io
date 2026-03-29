@@ -2,585 +2,384 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WesMeer Portfolio</title>
+    <title>Minecraft Parkour Shorts Generator - WesMeer</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        :root { --primary: #2ecc71; --bg: #0d0d0d; --panel: #1a1a1a; --border: #333; }
+        /* Import Minecraft-style fonts */
+        @import url('https://fonts.cdnfonts.com/css/minecraftia');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@700&family=Kanit:wght@900&family=Archivo+Black&display=swap');
 
-        :root {
-            --xp-color: #76ff03;
-            --mc-shadow: rgba(0,0,0,0.6);
-            --tooltip-border: #2e0854;
-            --tooltip-bg: #100110;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            image-rendering: pixelated; 
-        }
-
-        body {
-            font-family: 'VT323', monospace;
-            background-color: #313131;
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('background.jpg');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: white;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
-        /* --- Header & Splash Text --- */
-        header {
-            text-align: center;
-            padding: 80px 20px 40px 20px;
-            position: relative;
-        }
-
-        header h1 {
-            font-size: 8rem;
-            text-shadow: 10px 10px 0px #000;
-            letter-spacing: 5px;
-            position: relative;
-            z-index: 2;
-            transition: transform 0.2s ease;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; overflow-x: hidden; min-height: 100vh; }
         
-        header h1:hover {
-            transform: scale(1.02);
-        }
-
-        .splash-container {
-            position: absolute;
-            top: 70%;
-            left: 55%;
-            transform: rotate(-20deg);
-            z-index: 3;
-            pointer-events: none;
-            /* Zorg dat de animatie vanuit het midden van de tekst gebeurt */
-            transform-origin: center;
-        }
-
-        .splash-text {
-            display: inline-block;
-            color: #ffff55;
-            font-size: 2.5rem;
-            text-shadow: 3px 3px 0 #000;
-            /* De bekende Minecraft menu animatie */
-            animation: splashPulse 0.5s infinite alternate ease-in-out;
-            white-space: nowrap;
-        }
-
-        @keyframes splashPulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
-
-        /* --- De Chunks (Secties) --- */
-        .block-container {
-            width: 90%;
-            max-width: 900px;
-            margin: 0 auto 100px auto;
-        }
-
-        .section-block {
-            border: 8px solid #000;
-            margin-bottom: 80px;
-            box-shadow: 20px 20px 0px var(--mc-shadow);
-            position: relative;
-            overflow: hidden; 
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        /* POPUP SYSTEM */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; z-index: 10000; justify-content: center; align-items: center; text-align: center; }
+        .instr-content { background: #1a1a1a; padding: 30px; border-radius: 24px; border: 2px solid var(--primary); max-width: 450px; position: relative; }
         
-        .section-block:hover {
-            transform: translate(-5px, -5px);
-        }
+        /* LOADING POPUP SPECIFIC */
+        #loading-popup { display: none; }
+        #edge-banner { background: #ff4757; color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; font-weight: bold; display: block; }
 
-        .dirt-box {
-            background-image: url('dirt.png');
-            background-repeat: repeat;
-            background-size: 2000px;
-            padding-top: 50px; 
-        }
-
-        .dirt-box::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 48px;
-            background-image: url('grass_block.webp');
-            background-repeat: repeat-x;
-            background-size: contain;
-            z-index: 1;
-            border-bottom: 4px solid #000;
-            animation: windSway 4s infinite ease-in-out;
-        }
+        #editor-panel { width: 720px; background: var(--panel); padding: 25px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; flex-shrink: 0; }
         
-        @keyframes windSway {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
+        /* MINECRAFT TITLE STYLE */
+        h1 { 
+            font-family: 'Minecraftia', sans-serif; 
+            font-size: 28px; 
+            color: #55FF55; 
+            text-align: center; 
+            margin-top: 0; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            text-shadow: 4px 4px 0px #000;
+            margin-bottom: 25px;
         }
 
-        .stone-box {
-            background-image: url('stone.png');
-            background-repeat: repeat;
-            background-size: 2000px;
-            min-height: 500px; 
-        }
-
-        .bedrock-box {
-            background-image: url('bedrock.png');
-            background-repeat: repeat;
-            background-size: 2000px;
-            min-height: 400px;
-        }
-
-        .section-content {
-            padding: 50px;
-            background-color: rgba(0,0,0,0.4);
-            position: relative;
-            z-index: 2;
-            pointer-events: none; 
-        }
-
-        .section-content h2, 
-        .section-content p,
-        .section-content h1,
-        .section-content details {
-            pointer-events: none; 
-        }
-
-        /* Klikbare elementen */
-        .section-content a,
-        .section-content summary,
-        .section-content summary h2 {
-            pointer-events: auto !important;
-            cursor: pointer;
-        }
-
-        h2 { font-size: 4rem; text-shadow: 4px 4px 0px #000; margin-bottom: 30px; border-bottom: 4px solid #fff; display: inline-block; padding-bottom: 10px;}
-        p { font-size: 1.8rem; line-height: 1.4; margin-bottom: 20px; }
-
-        /* Styling voor het details element */
-        details {
-            margin-top: 20px;
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border: 4px solid #000;
-            pointer-events: auto !important;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        /* --- Ore Spawning & Mining --- */
-        .ore {
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            cursor: pointer;
-            z-index: 1;
-            transition: transform 0.1s;
-        }
-
-        .ore:hover {
-            transform: scale(1.1);
-            filter: brightness(1.2);
-        }
-
-        .ore.mined {
-            animation: mineAnim 0.3s forwards;
-            pointer-events: none;
-        }
-
-        @keyframes mineAnim {
-            0% { transform: scale(1.1) rotate(0); opacity: 1; }
-            50% { transform: scale(1.2) rotate(15deg); }
-            100% { transform: scale(0) rotate(-30deg); opacity: 0; }
-        }
+        label { display: block; font-size: 10px; text-transform: uppercase; color: #888; margin: 15px 0 8px 0; letter-spacing: 1px; }
+        textarea { width: 100%; height: 70px; background: #111; color: white; border: 1px solid #444; border-radius: 12px; padding: 12px; box-sizing: border-box; resize: none; outline: none; }
         
-        /* Particle effect */
-        .particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #555;
-            pointer-events: none;
-            z-index: 5;
-        }
+        .carousel-container { position: relative; display: flex; align-items: center; margin-bottom: 10px; padding: 0 40px; }
+        .carousel { display: flex; gap: 10px; overflow-x: hidden; scroll-behavior: smooth; padding: 10px 0; width: 100%; }
+        .nav-btn { background: rgba(0,0,0,0.9); border: 2px solid var(--primary); color: var(--primary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; position: absolute; z-index: 10; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .prev { left: 0; } .next { right: 0; }
 
-        /* XP Orb styling */
-        .xp-orb {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            pointer-events: none;
-            z-index: 10;
-            animation: orbPop 1.2s forwards ease-out;
-        }
+        .video-card { flex: 0 0 100px; height: 130px; background: #000; border-radius: 12px; cursor: pointer; border: 2px solid transparent; overflow: hidden; filter: grayscale(100%); transition: 0.3s; }
+        .video-card.active { border-color: var(--primary); filter: grayscale(0%); transform: scale(1.05); }
+        .video-card video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-        @keyframes orbPop {
-            0% { transform: translate(0, 0) scale(0.2) rotate(0); opacity: 0; }
-            20% { transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(45deg); opacity: 1; }
-            100% { transform: translate(var(--dx), calc(var(--dy) - 100px)) scale(0.6) rotate(180deg); opacity: 0; }
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .card-item { background: #fff; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; border: 3px solid transparent; color: #000; height: 50px; text-align: center; font-size: 12px; font-weight: bold; }
+        .card-item.selected { border-color: var(--primary); box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
 
-        /* --- Enchanting Table --- */
-        .enchant-container {
-            text-align: center;
-            margin: 50px auto;
-            display: none; 
-            animation: enchantPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        /* Styles & Animations */
+        .subtitle-hormozi { font-family: 'Montserrat', sans-serif; font-weight: 900; color: #f1c40f !important; text-shadow: 3px 3px 0 #000; text-transform: uppercase; }
+        .subtitle-wrap { font-family: 'Poppins', sans-serif; font-weight: 700; color: #fff !important; background: #ef4444 !important; padding: 5px 15px !important; border-radius: 10px !important; text-transform: lowercase; }
+        .subtitle-difference { font-family: 'Montserrat', sans-serif; font-weight: 900; color: #fff !important; background: #64748b !important; padding: 8px 18px !important; border-radius: 12px !important; text-transform: uppercase; }
+        .subtitle-sky { font-family: 'Kanit', sans-serif; color: #00d4ff !important; text-shadow: 0 0 8px #00d4ff; text-transform: uppercase; }
+        .subtitle-toxic { font-family: 'Montserrat', sans-serif; color: #2ecc71 !important; -webkit-text-stroke: 1.5px #000; text-transform: uppercase; }
+        .subtitle-lemon { font-family: 'Poppins', sans-serif; color: #ccff00 !important; text-shadow: 2px 2px 0 #000; text-transform: uppercase; }
+        .subtitle-basic { font-family: 'Archivo Black', sans-serif; color: #fff !important; text-transform: uppercase; }
+        .subtitle-outline { font-family: 'Poppins', sans-serif; color: #fff !important; -webkit-text-stroke: 1.5px #000; text-transform: uppercase; }
+        .subtitle-playful { font-family: 'Poppins', sans-serif; color: #fff !important; text-shadow: 2px 2px 0 #f97316; text-transform: lowercase; }
 
-        @keyframes enchantPop {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .enchanting-table {
-            width: 128px;
-            height: 128px;
-            animation: floatTable 3s infinite ease-in-out;
-            filter: drop-shadow(0 0 15px rgba(118, 255, 3, 0.4));
-        }
-
-        @keyframes floatTable {
-            0%, 100% { transform: translateY(30px); }
-            50% { transform: translateY(15px); }
-        }
-
-        /* --- HUD (XP-Bar) --- */
-        .hud {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            text-align: center;
-        }
-
-        .xp-container {
-            width: 400px;
-            height: 14px;
-            background: #1a1a1a;
-            border: 3px solid #000;
-            position: relative;
-        }
-
-        .xp-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--xp-color);
-            transition: width 0.3s ease;
-        }
-
-        .xp-level {
-            position: absolute;
-            top: -24px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--xp-color);
-            font-size: 1.8rem;
-            text-shadow: 2px 2px 0 #000;
-        }
+        .anim-pop { animation: subPop 0.12s ease-out forwards !important; }
+        .anim-bounce { animation: subBounce 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards !important; }
+        .anim-shake { animation: subShake 0.2s ease-in-out forwards !important; }
+        .anim-flip { animation: subFlip 0.3s ease-out forwards !important; }
+        .anim-glow { animation: subGlow 0.4s ease-in-out infinite alternate !important; }
+        .anim-slide { animation: subSlide 0.2s ease-out forwards !important; }
         
-        .xp-pop {
-            position: absolute;
-            color: var(--xp-color);
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 2px 2px #000;
-            pointer-events: none;
-            animation: xpFloat 1s forwards;
-            z-index: 2000;
-        }
+        @keyframes subPop { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes subBounce { 0% { transform: scale(1.8); } 100% { transform: scale(1); } }
+        @keyframes subShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        @keyframes subFlip { 0% { transform: rotateX(90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
+        @keyframes subGlow { from { filter: brightness(1); } to { filter: brightness(1.8) drop-shadow(0 0 10px white); } }
+        @keyframes subSlide { 0% { transform: translateX(-30px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+
+        #main-btn { width: 100%; padding: 18px; background: var(--primary); border: none; color: black; font-weight: 900; border-radius: 15px; cursor: pointer; margin-top: 20px; text-transform: uppercase; font-family: 'Minecraftia', sans-serif; font-size: 14px; }
         
-        @keyframes xpFloat {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-50px); opacity: 0; }
-        }
+        #video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: none; background: #000; z-index: 9999; }
+        #shorts-wrapper { position: relative; height: 100%; aspect-ratio: 9/16; margin: 0 auto; overflow: hidden; }
+        #mainVideo { width: 100%; height: 100%; object-fit: cover; }
+        #subtitle-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; pointer-events: none; z-index: 100; }
+        #subtitle { display: inline-block; text-align: center; line-height: 1.1; white-space: pre-wrap; }
 
-        footer {
-            background: #000;
-            padding: 50px 20px;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            header h1 { font-size: 4rem; }
-            .splash-text { font-size: 1.5rem; }
-            .xp-container { width: 250px; }
-            .section-content { padding: 30px; }
-        }
-
-        a {
-            color: #ffff55;
-            text-decoration: none;
-            position: relative;
-            padding: 2px 5px;
-            transition: background 0.2s;
-        }
+        #instructions { display: none; }
+        .start-record-btn { background: var(--primary); border: none; padding: 15px 30px; font-weight: 900; border-radius: 12px; cursor: pointer; margin-top: 20px; text-transform: uppercase; width: 100%; font-family: 'Minecraftia', sans-serif; }
         
-        a:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        a:hover::after {
-            content: "Click to go!";
-            position: absolute;
-            bottom: 110%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--tooltip-bg);
-            border: 2px solid var(--tooltip-border);
-            color: #fff;
-            padding: 5px 10px;
-            font-size: 1rem;
-            white-space: nowrap;
-            z-index: 10;
-        }
+        .tutorial-vid { width: 100%; border-radius: 12px; border: 1px solid #444; margin: 15px 0; background: #000; }
 
-        summary {
-            text-decoration: none;
-            position: relative;
-            padding: 2px 5px;
-            transition: background 0.2s;
-        }
-
-        summary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        summary:hover::after {
-            content: "Click to show!";
-            position: absolute;
-            bottom: 110%;
-            left: 0%;
-            background: var(--tooltip-bg);
-            border: 2px solid var(--tooltip-border);
-            color: #fff;
-            padding: 5px 10px;
-            font-size: 1rem;
-            white-space: nowrap;
-            z-index: 10;
-        }
+        #countdown-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; z-index: 10001; display: none; }
+        #countdown-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; font-weight: 900; color: var(--primary); font-family: 'Montserrat'; }
+        .timer-svg { transform: rotate(-90deg); width: 300px; height: 300px; }
+        .timer-circle-bar { fill: none; stroke: var(--primary); stroke-width: 15; stroke-dasharray: 880; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>WESMEER</h1>
-        <div class="splash-container">
-            <span class="splash-text" id="splashText">Subscribe to me on YouTube!</span>
+    <div id="loading-popup" class="overlay">
+        <div class="instr-content">
+            <h2 style="font-family: 'Minecraftia', sans-serif; color: var(--primary);">Wrong Browser!</h2>
+            <div id="edge-banner">⚠️ FOR MORE TTS VOICES:<br>Please use Microsoft Edge. Your current browser doesn't support all the TTS Voices.</div>
+            <p style="color: #888; font-size: 13px;">This site is made for Microsoft Edge...</p>
+            <button class="start-record-btn" onclick="closeLoading()">Enter Anyways</button>
         </div>
-        <p style="font-size: 2.2rem; text-shadow: 2px 2px #000; margin-top: 10px;"></p>
-    </header>
-
-    <div class="block-container">
-        
-        <section class="section-block dirt-box">
-            <div class="section-content">
-                <h2><span>🧭</span> About me</h2>
-                <p>Hello reader, I am WesMeer. A Minecraft YouTuber who also likes programming.</p>
-                <p>I like programming in: Python, Lua, HTML+CSS</p>
-            </div>
-        </section>
-
-        <section class="section-block stone-box" id="miningArea">
-            <div class="section-content">
-                <h2><span>⛏️</span> Links</h2>
-                <p>Socials:</p>
-                <p>▶️ <a href="https://www.youtube.com/@WesMeer" target="_blank">YouTube</a></p>
-                <p>❤️ <a href="https://www.instagram.com/wesmeer11/" target="_blank">Instagram</a></p>
-                <p>📙 <a href="https://www.reddit.com/r/WesMeer/" target="_blank">Reddit</a></p>
-                <br>
-                <p>Mods:</p>
-                <p>💪 <a href="https://curseforge.com/members/wesmeer" target="_blank">CurseForge</a></p>
-                <p>🌾 <a href="https://mcpedl.com/user/wesmeer" target="_blank">MCPEDL</a></p>
-                <p>🌎 <a href="https://planetminecraft.com/member/wesmeer" target="_blank">PlanetMinecraft</a></p>
-            </div>
-        </section>
-
-        <section class="section-block bedrock-box">
-            <div class="section-content">
-                <h2><span>🧱</span> Projects</h2>
-                <details>
-                    <summary><h2>Web Tools:</h2></summary>
-                    <img width="100%" style="max-width: 500px; border: 4px solid #000; margin-top: 10px;" src="parkour.png" alt="YouTube Banner">
-                    <h1 style="margin-top: 15px;"><a href="parkour">Parkour Short Generator</a></h1>
-                    <p>Create some Shorts/TikToks with Minecraft Parkour on the background and Text To Speech Voices!</p>
-                </details>
-                <details>
-                    <summary><h2>Art:</h2></summary>
-                    <img width="100%" style="max-width: 500px; border: 4px solid #000; margin-top: 10px;" src="banner.png" alt="YouTube Banner">
-                    <h1 style="margin-top: 15px;">YouTube Banner</h1>
-                    <p>Background from Nova Skin.<br>I did the color correction in Photopea.<br>And the text did I make in Blockbench.</p>
-                </details>
-            </div>
-        </section>
-
-        <div id="enchantContainer" class="enchant-container">
-            <h2 style="border: none; margin-bottom: 10px;">ENCHANTING TABLE UNLOCKED!</h2>
-            <img src="enchantingtable.webp" class="enchanting-table" alt="Enchanting Table">
-            <p style="color: #aa00aa; text-shadow: 1px 1px #000;"></p>
-        </div>
-
     </div>
 
-    <div class="hud">
-        <div class="xp-container">
-            <div class="xp-level" id="levelCount">1</div>
-            <div id="xpFill" class="xp-fill"></div>
+    <div id="instructions" class="overlay">
+        <div class="instr-content">
+            <h2 style="font-family: 'Minecraftia', sans-serif;">How to Export 🎬</h2>
+            <video class="tutorial-vid" src="tut.mov" autoplay loop muted playsinline></video>
+            <p style="font-size: 13px; color: #bbb; margin-bottom: 5px;">1. Select <b>"Window"</b> in the popup.</p>
+            <p style="font-size: 13px; color: #bbb; margin-bottom: 5px;">2. Click on <b>"Minecraft Parkour S..."</b> (This Window).</p>
+            <p style="font-size: 13px; color: #bbb; margin-bottom: 5px;">3. Check <b>"share system audio"</b> (Bottom right).</p>
+            <button class="start-record-btn" onclick="startProduction()">Start Now</button>
         </div>
-        <div style="margin-top: 5px; color: #ff5555; font-size: 1.8rem;">❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div>
     </div>
 
-    <footer>
-        <p style="font-size: 1.5rem;">WesMeer Portfolio - <span id="year"></span></p>
-        <p style="opacity: 0.5; margin-top: 10px;">© WesMeer | Digging through code.</p>
-    </footer>
+    <div id="editor-panel">
+        <h1>MINECRAFT PARKOUR SHORT GENERATOR</h1>
+        <textarea id="textInput" placeholder="Enter script..."></textarea>
+
+        <label>1. Select Background Map</label>
+        <div class="carousel-container">
+            <button class="nav-btn prev" onclick="navigateCarousel(-1)">&#10094;</button>
+            <div class="carousel" id="videoCarousel"></div>
+            <button class="nav-btn next" onclick="navigateCarousel(1)">&#10095;</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
+            <div><label>2. Voice Narrator</label><select id="voiceSelect" style="width:100%; padding:10px; background:#111; color:white; border-radius:8px; border:1px solid #444;"></select></div>
+            <div><label>3. Vertical Alignment</label><select id="alignSelect" style="width:100%; padding:10px; background:#111; color:white; border-radius:8px; border:1px solid #444;"><option value="center">Center</option><option value="flex-start">Top</option><option value="flex-end" selected>Bottom (Safe)</option></select></div>
+        </div>
+
+        <label>4. Subtitle Style</label>
+        <div class="grid-container" id="styleGrid">
+            <div class="card-item" onclick="selectStyle('hormozi', this)"><span class="subtitle-hormozi" style="font-size:12px">Hormozi</span></div>
+            <div class="card-item" onclick="selectStyle('wrap', this)"><span class="subtitle-wrap" style="font-size:12px">Wrap 1</span></div>
+            <div class="card-item" onclick="selectStyle('difference', this)"><span class="subtitle-difference" style="font-size:12px">Difference</span></div>
+            <div class="card-item" onclick="selectStyle('sky', this)"><span class="subtitle-sky" style="font-size:12px">Sky Neon</span></div>
+            <div class="card-item" onclick="selectStyle('toxic', this)"><span class="subtitle-toxic" style="font-size:12px">Toxic</span></div>
+            <div class="card-item" onclick="selectStyle('lemon', this)"><span class="subtitle-lemon" style="font-size:12px">Lemon</span></div>
+            <div class="card-item" onclick="selectStyle('basic', this)"><span class="subtitle-basic" style="font-size:12px; color:#000!important">Basic</span></div>
+            <div class="card-item" onclick="selectStyle('outline', this)"><span class="subtitle-outline" style="font-size:12px">Outline</span></div>
+            <div class="card-item" onclick="selectStyle('playful', this)"><span class="subtitle-playful" style="font-size:12px">Playful</span></div>
+        </div>
+
+        <label>5. Subtitle Animation</label>
+        <div class="grid-container" id="animGrid">
+            <div class="card-item" onclick="runPreview('pop', this)"><span>POP</span></div>
+            <div class="card-item" onclick="runPreview('bounce', this)"><span>BOUNCE</span></div>
+            <div class="card-item" onclick="runPreview('shake', this)"><span>SHAKE</span></div>
+            <div class="card-item" onclick="runPreview('flip', this)"><span>FLIP</span></div>
+            <div class="card-item" onclick="runPreview('glow', this)"><span>GLOW</span></div>
+            <div class="card-item" onclick="runPreview('slide', this)"><span>SLIDE</span></div>
+        </div>
+
+        <button id="main-btn" onclick="openInstructions()">START PRODUCTION</button>
+    </div>
+
+    <div id="countdown-box">
+        <svg class="timer-svg"><circle cx="150" cy="150" r="140" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="15"></circle><circle id="timer-bar" class="timer-circle-bar" cx="150" cy="150" r="140"></circle></svg>
+        <div id="countdown-text">3</div>
+    </div>
+
+    <div id="video-container">
+        <div id="shorts-wrapper">
+            <video id="mainVideo" loop muted></video>
+            <div id="subtitle-wrapper"><div id="subtitle"></div></div>
+        </div>
+    </div>
+
+    <canvas id="cropCanvas" width="1080" height="1920" style="display:none;"></canvas>
 
     <script>
-        const oreFiles = [
-            'ores/coal.webp', 'ores/copper.webp', 'ores/diamond.webp', 'ores/emerald.webp',
-            'ores/gold.webp', 'ores/iron.webp', 'ores/lapis.webp', 'ores/redstone.webp'
-        ];
+        const synth = window.speechSynthesis;
+        const sub = document.getElementById('subtitle');
+        const video = document.getElementById('mainVideo');
+        const carousel = document.getElementById('videoCarousel');
+        const alignSelect = document.getElementById('alignSelect');
+        const editor = document.getElementById('editor-panel');
+        const container = document.getElementById('video-container');
+        const cropCanvas = document.getElementById('cropCanvas');
+        const cropCtx = cropCanvas.getContext('2d');
 
-        const splashes = [
-            'Subscribe on YouTube!', 'Follow on Instagram!', 'Don\'t dig straight down!',
-            'Developing some fun!', 'Crafting Solutions!', 'Error 418: I\'m a teapot',
-            'Error 404: Not found', 'Minecraft > Roblox', 'Meow...',
-            'Hrmm... Villager approved!', 'Never gonna give you up!',
-            'Minceraft', 'Easter Egg, I guess', 'As seen on YouTube!',
-            "print('hello world')", 'Hello World', "Jeb_", "Dinnerbone",
-            "Grumm", "Toast", "Join the Reddit Community!",
-            "Like that smash button!", "what does the fox say?"
-        ];
+        let selectedStyle = 'hormozi', selectedAnim = 'pop', selectedVideoNum = 1;
+        let recorder, chunks = [];
 
-        let currentXPLevel = 1;
-        const startLevel = 1;
-
-        function createParticles(x, y, color) {
-            const area = document.getElementById('miningArea');
-            for (let i = 0; i < 8; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = x + 'px';
-                p.style.top = y + 'px';
-                p.style.background = color || '#555';
-                area.appendChild(p);
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 5 + 2;
-                const vx = Math.cos(angle) * speed;
-                const vy = Math.sin(angle) * speed;
-                let life = 1;
-                const interval = setInterval(() => {
-                    p.style.left = (parseFloat(p.style.left) + vx) + 'px';
-                    p.style.top = (parseFloat(p.style.top) + vy) + 'px';
-                    life -= 0.05;
-                    p.style.opacity = life;
-                    if (life <= 0) { clearInterval(interval); p.remove(); }
-                }, 30);
-            }
+        // STARTUP LOGIC
+        function checkBrowser() {
+            const isEdge = window.navigator.userAgent.indexOf("Edg") > -1;
+            if (!isEdge) document.getElementById('loading-popup').style.display = 'flex';
         }
 
-        function dropXPOrb(x, y) {
-            const area = document.getElementById('miningArea');
-            // We droppen 1-3 orbs voor extra effect
-            const orbCount = Math.floor(Math.random() * 3) + 1;
+        function closeLoading() {
+            document.getElementById('loading-popup').style.display = 'none';
+            synth.cancel();
+        }
+
+        function buildCarousel() {
+            carousel.innerHTML = "";
+            for(let i = 1; i <= 10; i++) createCard(i);
+        }
+
+        function createCard(i) {
+            const card = document.createElement('div');
+            card.className = `video-card c-${i}`;
+            card.dataset.num = i;
+            card.onclick = () => selectVideoByEl(card);
+            card.innerHTML = `<video src="videos/${i}.mp4" muted loop></video>`;
+            carousel.appendChild(card);
+        }
+
+        function selectVideoByEl(el, smooth = true) {
+            selectedVideoNum = parseInt(el.dataset.num);
+            document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            carousel.scrollTo({ left: el.offsetLeft - (carousel.offsetWidth / 2) + 50, behavior: smooth ? 'smooth' : 'auto' });
+        }
+
+        function navigateCarousel(dir) {
+            const active = document.querySelector('.video-card.active');
+            if(!active) return;
+            const target = dir === 1 ? active.nextElementSibling : active.previousElementSibling;
+            if(target) selectVideoByEl(target);
+        }
+
+        function selectStyle(name, el) {
+            selectedStyle = name;
+            document.querySelectorAll('#styleGrid .card-item').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function runPreview(animName, el) {
+            selectedAnim = animName;
+            document.querySelectorAll('#animGrid .card-item').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            const span = el.querySelector('span');
+            span.className = "";
+            void span.offsetWidth;
+            span.className = "anim-" + animName;
+        }
+
+        function randomizeEverything() {
+            const allCards = document.querySelectorAll('.video-card');
+            if(allCards.length > 0) selectVideoByEl(allCards[Math.floor(Math.random() * allCards.length)], false);
+            const voiceSel = document.getElementById('voiceSelect');
+            if(voiceSel.options.length > 0) voiceSel.selectedIndex = Math.floor(Math.random() * voiceSel.options.length);
+            const styleCards = document.querySelectorAll('#styleGrid .card-item');
+            if(styleCards.length > 0) styleCards[Math.floor(Math.random() * styleCards.length)].click();
+            const animCards = document.querySelectorAll('#animGrid .card-item');
+            if(animCards.length > 0) animCards[Math.floor(Math.random() * animCards.length)].click();
+            alignSelect.selectedIndex = Math.floor(Math.random() * alignSelect.options.length);
+        }
+
+        function resetUI() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            container.style.display = 'none';
+            editor.style.display = 'block';
+            document.body.style.padding = '20px';
+            video.pause();
+        }
+
+        function openInstructions() {
+            if(!document.getElementById('textInput').value.trim()) return alert("Write a script!");
+            document.getElementById('instructions').style.display = 'flex';
+        }
+
+        function updateSubtitle(word, isFinal = false) {
+            sub.className = ""; 
+            sub.innerText = ""; 
+            void sub.offsetWidth; 
             
-            for(let i = 0; i < orbCount; i++) {
-                const orb = document.createElement('img');
-                orb.src = 'xp.webp';
-                orb.className = 'xp-orb';
-                
-                // Willekeurige richting voor de sprong
-                const dx = (Math.random() - 0.5) * 120;
-                const dy = (Math.random() - 0.5) * 120;
-                orb.style.setProperty('--dx', dx + 'px');
-                orb.style.setProperty('--dy', dy + 'px');
-                
-                orb.style.left = x + 'px';
-                orb.style.top = y + 'px';
-                
-                area.appendChild(orb);
-                setTimeout(() => orb.remove(), 1200);
-            }
-        }
-
-        function spawnOres() {
-            const area = document.getElementById('miningArea');
-            const amount = Math.floor(Math.random() * 8) + 10; 
-            const placedOres = [];
-            const minDistance = 75; 
-
-            for (let i = 0; i < amount; i++) {
-                let x, y, overlap = false, attempts = 0;
-                do {
-                    overlap = false;
-                    x = Math.random() * (area.offsetWidth - 80);
-                    y = Math.random() * (area.offsetHeight - 80);
-                    attempts++;
-                    for (let placed of placedOres) {
-                        const dist = Math.sqrt(Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2));
-                        if (dist < minDistance) { overlap = true; break; }
-                    }
-                } while (overlap && attempts < 100);
-
-                if (!overlap) {
-                    placedOres.push({ x, y });
-                    const ore = document.createElement('img');
-                    ore.src = oreFiles[Math.floor(Math.random() * oreFiles.length)];
-                    ore.className = 'ore';
-                    ore.style.left = x + 'px';
-                    ore.style.top = y + 'px';
-                    ore.onclick = function(e) {
-                        if (this.classList.contains('mined')) return;
-                        this.classList.add('mined');
-                        
-                        createParticles(x + 32, y + 32);
-                        dropXPOrb(x + 20, y + 20);
-                        
-                        const pop = document.createElement('div');
-                        pop.className = 'xp-pop';
-                        pop.textContent = ''; 
-                        pop.style.left = e.clientX + 'px';
-                        pop.style.top = e.clientY + 'px';
-                        pop.style.position = 'fixed';
-                        document.body.appendChild(pop);
-                        setTimeout(() => pop.remove(), 1000);
-                        
-                        currentXPLevel++;
-                        document.getElementById('levelCount').textContent = currentXPLevel;
-                        
-                        if (currentXPLevel >= startLevel + 9) {
-                            document.getElementById('enchantContainer').style.display = 'block';
-                        }
-                    };
-                    area.appendChild(ore);
+            setTimeout(() => {
+                sub.className = 'anim-' + selectedAnim + ' subtitle-' + selectedStyle;
+                if (isFinal) {
+                    sub.style.whiteSpace = "pre-wrap";
+                    sub.innerText = "THANKS\nFOR\nWATCHING!";
+                } else {
+                    sub.style.whiteSpace = "nowrap";
+                    sub.innerText = (selectedStyle === 'wrap' || selectedStyle === 'playful') ? word.toLowerCase() : word.toUpperCase();
+                    sub.style.fontSize = word.length > 8 ? "50px" : "75px";
                 }
-            }
+            }, 10);
         }
 
-        window.onload = function() {
-            spawnOres();
-            document.getElementById("year").textContent = new Date().getFullYear();
-            document.getElementById("splashText").textContent = splashes[Math.floor(Math.random() * splashes.length)];
+        async function startProduction() {
+            document.getElementById('instructions').style.display = 'none';
+            const text = document.getElementById('textInput').value.trim();
+            try {
+                const sourceStream = await navigator.mediaDevices.getDisplayMedia({ 
+                    video: { width: 3840, height: 2160 }, 
+                    audio: { echoCancellation: true } 
+                });
+                if (sourceStream.getAudioTracks().length === 0) {
+                    sourceStream.getTracks().forEach(t => t.stop());
+                    return alert("Error: Systeemgeluid niet gedeeld!");
+                }
+                if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+                editor.style.display = 'none';
+                container.style.display = 'block';
+                document.body.style.padding = '0';
+                video.src = `videos/${selectedVideoNum}.mp4`;
+                const align = alignSelect.value;
+                document.getElementById('subtitle-wrapper').style.alignItems = align;
+                sub.style.marginBottom = (align === 'flex-end') ? "140px" : "0px";
+                sub.style.marginTop = (align === 'flex-start') ? "140px" : "0px";
+
+                const procVid = document.createElement('video');
+                procVid.srcObject = sourceStream;
+                procVid.muted = true;
+                procVid.play();
+                const cropLoop = () => {
+                    if (container.style.display === 'block') {
+                        const sW = procVid.videoWidth, sH = procVid.videoHeight;
+                        const cW = sH * (9/16);
+                        cropCtx.drawImage(procVid, (sW - cW)/2, 0, cW, sH, 0, 0, 1080, 1920);
+                        requestAnimationFrame(cropLoop);
+                    }
+                };
+                procVid.onloadedmetadata = cropLoop;
+                const finalStream = cropCanvas.captureStream(60);
+                finalStream.addTrack(sourceStream.getAudioTracks()[0]);
+
+                document.getElementById('countdown-box').style.display = 'block';
+                let count = 3;
+                const timer = setInterval(() => {
+                    document.getElementById('countdown-text').innerText = count;
+                    document.getElementById('timer-bar').style.strokeDashoffset = 880 - (count / 3) * 880;
+                    if(count === -1) {
+                        clearInterval(timer);
+                        document.getElementById('countdown-box').style.display = 'none';
+                        runActualShow(finalStream, text, sourceStream);
+                    }
+                    count--;
+                }, 1000);
+            } catch(e) { resetUI(); }
+        }
+
+        function runActualShow(stream, text, sourceStream) {
+            chunks = [];
+            recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9', bitsPerSecond: 15000000 });
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const a = document.createElement('a');
+                const now = new Date();
+                a.href = URL.createObjectURL(blob);
+                a.download = `short_${now.getHours()}${now.getMinutes()}.webm`;
+                a.click();
+                sourceStream.getTracks().forEach(t => t.stop());
+                resetUI();
+            };
+            recorder.start();
+
+            const utter = new SpeechSynthesisUtterance(text);
+            const voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+            utter.voice = voices[document.getElementById('voiceSelect').selectedIndex || 0];
+            utter.rate = 1.3;
+
+            utter.onboundary = (e) => {
+                if(e.name === 'word') {
+                    const word = text.substr(e.charIndex, e.charLength).replace(/[.,!?;:]/g, '');
+                    updateSubtitle(word);
+                }
+            };
+            utter.onend = () => { 
+                updateSubtitle("", true);
+                setTimeout(() => { recorder.stop(); video.pause(); }, 3500); 
+            };
+            video.play().then(() => { synth.cancel(); synth.speak(utter); });
+        }
+
+        window.speechSynthesis.onvoiceschanged = () => {
+            const v = synth.getVoices().filter(v => v.lang.startsWith('en'));
+            document.getElementById('voiceSelect').innerHTML = v.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
+            randomizeEverything();
         };
 
-        window.onscroll = function() {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById("xpFill").style.width = scrolled + "%";
-        };
+        checkBrowser();
+        buildCarousel();
     </script>
 </body>
 </html>
