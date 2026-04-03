@@ -443,13 +443,13 @@
         }
         function dropXPOrb(x, y) {
             const area = document.getElementById('miningArea');
-            // We droppen 1-3 orbs voor extra effect
+
             const orbCount = Math.floor(Math.random() * 3) + 1;
             for(let i = 0; i < orbCount; i++) {
                 const orb = document.createElement('img');
                 orb.src = 'xp.webp';
                 orb.className = 'xp-orb';
-                // Willekeurige richting voor de sprong
+
                 const dx = (Math.random() - 0.5) * 120;
                 const dy = (Math.random() - 0.5) * 120;
                 orb.style.setProperty('--dx', dx + 'px');
@@ -520,16 +520,16 @@
         };
     </script>
 <script>
-    const channelID = "UCrNQ6kxcTMwii3P044nDzwg"; // Vul hier je ID in
+    const channelID = "UCrNQ6kxcTMwii3P044nDzwg"; 
     const container = document.getElementById('latest-video-container');
-    // We gebruiken rss2json om de YouTube RSS feed om te zetten naar leesbare data
+
     const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelID}`;
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
             if (data.items && data.items.length > 0) {
-                // De bovenste video in de feed is de nieuwste
+
                 const latestVideo = data.items[0];
                 const videoId = latestVideo.link.split('v=')[1];
                 const publishDate = new Date(latestVideo.pubDate).toLocaleDateString('en-US', {
@@ -537,12 +537,11 @@
                     month: 'long',
                     day: 'numeric'
                 });
-                // Maak de embed code
+
                 container.innerHTML = `
                     <h1>Latest video: ${latestVideo.title}</h1><br>
                     <iframe 
-                        width="560" 
-                        height="315" 
+                        width="100%" height="315px" style="max-width: 500px; border: 4px solid #000; margin-top: 10px;"
                         src="https://www.youtube.com/embed/${videoId}" 
                         frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
