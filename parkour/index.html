@@ -103,6 +103,81 @@
         .timer-svg { transform: rotate(-90deg); width: 300px; height: 300px; }
         .timer-circle-bar { fill: none; stroke: var(--primary); stroke-width: 15; stroke-dasharray: 880; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
     </style>
+    <style>
+/* AI Input Wrapper & Sparkle Button */
+.ai-input-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
+
+.ai-sparkle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+/* De schuivende tooltip */
+.ai-sparkle-btn::after {
+    content: "Generate Story (AI)";
+    position: absolute;
+    right: 40px; /* Startpositie */
+    background: var(--primary);
+    color: black;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-family: 'Minecraftia', sans-serif;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px); /* Begint iets naar rechts */
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.ai-sparkle-btn:hover::after {
+    opacity: 1;
+    transform: translateX(0); /* Schuift naar links naar de eindpositie */
+}
+
+.ai-sparkle-btn:hover {
+    transform: translateY(-50%) scale(1.1);
+    filter: drop-shadow(0 0 8px var(--primary));
+}
+
+/* AI Modal Styling */
+#ai-popup { display: none; }
+.ai-modal {
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 24px;
+    border: 2px solid var(--primary);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+.ai-modal input {
+    width: 100%;
+    padding: 15px;
+    background: #000;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 12px;
+    margin: 20px 0;
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+</style>
 </head>
 <body>
 
@@ -128,7 +203,23 @@
 
     <div id="editor-panel">
         <h1>MINECRAFT PARKOUR SHORT GENERATOR</h1>
-        <textarea id="textInput" placeholder="Enter script..."></textarea>
+        <div id="ai-popup" class="overlay">
+            <div class="ai-modal">
+                <h2 style="font-family: 'Minecraftia', sans-serif; color: var(--primary); margin: 0;">AI Story Writer</h2>
+                <p style="color: #888; font-size: 12px; margin-top: 10px;">What should your scary story be about?</p>
+                <input type="text" id="aiTopicInput" placeholder="e.g. A haunted server, 3 AM phone call...">
+                <div style="display: flex; gap: 10px;">
+                    <button class="start-record-btn" style="margin:0; background: #333; color: white;" onclick="closeAIPopup()">Cancel</button>
+                    <button class="start-record-btn" style="margin:0;" onclick="submitAIPrompt()">Generate ✨</button>
+                </div>
+            </div>
+        </div>
+
+        <label>1. Your Script</label>
+        <div class="ai-input-wrapper">
+            <textarea id="textInput" placeholder="Write your own story or click the star for AI..." style="height: 120px;"></textarea>
+            <button class="ai-sparkle-btn" onclick="openAIPopup()">✨</button>
+        </div>
 
         <label>1. Select Background Map</label>
         <div class="carousel-container">
@@ -389,6 +480,76 @@
 
         checkBrowser();
         buildCarousel();
-    </script>
+
+function openAIPopup() {
+    document.getElementById('ai-popup').style.display = 'flex';
+    document.getElementById('aiTopicInput').focus();
+}
+
+function closeAIPopup() {
+    document.getElementById('ai-popup').style.display = 'none';
+}
+
+async function submitAIPrompt() {
+    const topicInput = document.getElementById('aiTopicInput');
+    const topic = topicInput.value.trim();
+    const textArea = document.getElementById('textInput');
+    const sparkleBtn = document.querySelector('.ai-sparkle-btn');
+    
+    if (!topic) return alert("Please enter a topic!");
+
+    // Sluit de popup en toon laden
+    closeAIPopup();
+    textArea.value = "AI is writing your story... Please wait.";
+    sparkleBtn.innerText = "⏳";
+    sparkleBtn.disabled = true;
+
+    try {
+        const basePrompt = `Write a short story or script based on the following topic: ${topic}. Use short sentences, every sentence on a new line, and keep it under 60 words. No emojis.`;
+        const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(basePrompt)}`);
+        
+        if (!response.ok) throw new Error();
+
+        const text = await response.text();
+        textArea.value = text.trim();
+        
+    } catch (error) {
+        alert("The AI encountered a glitch. Try again!");
+        textArea.value = "";
+    } finally {
+        sparkleBtn.innerText = "✨";
+        sparkleBtn.disabled = false;
+        topicInput.value = ""; // Reset voor de volgende keer
+    }
+}
+
+    window.onload = () => {
+        // Start automatisch de AI generatie met de standaard prompt
+        autoGenerateFirstStory();
+    };
+
+    async function autoGenerateFirstStory() {
+        const textArea = document.getElementById('textInput');
+        const sparkleBtn = document.querySelector('.ai-sparkle-btn');
+        
+        // Toon een laad-bericht in het tekstveld
+        textArea.value = "Generating your first story... ✍️";
+        if(sparkleBtn) sparkleBtn.innerText = "⏳";
+
+        try {
+            // De prompt die je specifiek vroeg
+            const basePrompt = "Generate me a scary story that I can read in under than a minute. Use short sentences, line breaks, and a dark twist. No emojis.";
+            
+            const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(basePrompt)}`);
+            const text = await response.text();
+            
+            textArea.value = text.trim();
+        } catch (error) {
+            textArea.value = "Welcome! Click the star to generate your first story.";
+        } finally {
+            if(sparkleBtn) sparkleBtn.innerText = "✨";
+        }
+    }
+</script>
 </body>
 </html>
