@@ -1,104 +1,1839 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Html Playground</title>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QQ465WLE0C"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HTML Playground</title>
 
-    gtag('config', 'G-QQ465WLE0C');
-  </script>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      display: flex;
-      height: 100vh;
-    }
-    /* Linker paneel: de code textbox */
-    #left-panel {
-      width: 50%;
-      border-right: 1px solid #ccc;
-      padding: 10px;
-    }
-    /* Rechter paneel: de knop en preview */
-    #right-panel {
-      width: 50%;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-    }
-    #code-input {
-      width: 100%;
-      height: calc(100vh - 20px);
-      font-family: monospace;
-      font-size: 14px;
-      padding: 10px;
-      resize: none;
-    }
-    #run-btn {
-      margin-bottom: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      align-self: flex-start;
-    }
-    #preview {
-      flex-grow: 1;
-      border: 1px solid #ccc;
-      padding: 10px;
-      overflow: auto;
-      background-color: #fff;
-    }
-  </style>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            padding: 10px;
+            background-color: #ddd;
+            overflow: hidden;
+        }
+
+
+        .editor {
+            position: relative;
+            width: 50%;
+            height: 100%;
+            min-width: 0;
+        }
+
+        textarea {
+            display: block;
+
+            width: 100%;
+            height: 100%;
+
+            padding: 15px;
+
+            font-size: 16px;
+            font-family: monospace;
+
+            border: 1px solid #ccc;
+            border-radius: 5px;
+
+            outline: none;
+            resize: none;
+
+            white-space: pre;
+            overflow: auto;
+        }
+
+
+        iframe {
+            display: block;
+
+            width: 50%;
+            height: 100%;
+
+            min-width: 0;
+
+            background-color: #fff;
+
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+
+        #autocomplete {
+            position: absolute;
+
+            display: none;
+
+            min-width: 180px;
+            max-width: 300px;
+
+            max-height: 224px;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            background: #ddd;
+            color: #000;
+
+            border: 1px solid #ccc;
+            border-radius: 6px;
+
+            font-family: monospace;
+            font-size: 14px;
+
+            z-index: 1000;
+        }
+
+        .suggestion {
+            height: 32px;
+
+            padding: 0 12px;
+
+            display: flex;
+            align-items: center;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+        }
+
+        .suggestion.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        .suggestion:hover {
+            background: #ccc;
+        }
+
+        .suggestion.active:hover {
+            background: #0078d4;
+        }
+
+
+        #mirror {
+            position: absolute;
+
+            visibility: hidden;
+
+            top: 0;
+            left: 0;
+
+            pointer-events: none;
+
+            white-space: pre;
+            word-wrap: normal;
+            overflow-wrap: normal;
+        }
+
+
+        @media (max-width: 900px) {
+
+            textarea {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            #autocomplete {
+                max-width: 260px;
+            }
+        }
+
+
+
+        @media (max-width: 700px) {
+
+            html,
+            body {
+                height: auto;
+                min-height: 100%;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+
+                gap: 8px;
+                padding: 8px;
+
+                overflow: auto;
+            }
+
+
+            .editor {
+                width: 100%;
+                height: 55vh;
+                min-height: 350px;
+                flex-shrink: 0;
+            }
+
+
+            iframe {
+                width: 100%;
+                height: 45vh;
+                min-height: 300px;
+                flex-shrink: 0;
+            }
+
+            textarea {
+                padding: 12px;
+
+                font-size: 16px;
+                line-height: 1.5;
+
+                border-radius: 5px;
+            }
+
+            #autocomplete {
+                min-width: 160px;
+                max-width: calc(100vw - 20px);
+
+                max-height: 192px;
+
+                font-size: 14px;
+            }
+
+            .suggestion {
+                height: 32px;
+                padding: 0 10px;
+            }
+        }
+
+
+
+        @media (max-width: 400px) {
+
+            body {
+                padding: 5px;
+                gap: 5px;
+            }
+
+            .editor {
+                height: 60vh;
+                min-height: 300px;
+            }
+
+            iframe {
+                height: 40vh;
+                min-height: 250px;
+            }
+
+            #autocomplete {
+                max-width: calc(100vw - 10px);
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <!-- Linker kolom: code textbox -->
-  <div id="left-panel">
-    <textarea id="code-input">
-<!DOCTYPE html>
-<html>
+
+<div class="editor">
+
+<textarea id="editor"><!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Example</title>
-  <style>
-    body { background-color: #f0f0f0; font-family: sans-serif; }
-    h1 { color: darkblue; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Document</title>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>Welcome in the Html Playground.</p>
+
 </body>
-</html>
-    </textarea>
-  </div>
+</html></textarea>
 
-  <!-- Rechter kolom: knop en preview -->
-  <div id="right-panel">
-    <button id="run-btn">Run Code</button>
-    <div id="preview"></div>
-  </div>
+<div id="autocomplete"></div>
+<div id="mirror"></div>
 
-  <script>
-    // Functie om de preview bij te werken met de code uit de textarea
-    function updatePreview() {
-      var code = document.getElementById('code-input').value;
-      document.getElementById('preview').innerHTML = code;
+</div>
+
+<iframe id="preview"></iframe>
+
+
+<script>
+
+const htmlElements = [
+    "a",
+    "abbr",
+    "address",
+    "area",
+    "article",
+    "aside",
+    "audio",
+
+    "b",
+    "base",
+    "bdi",
+    "bdo",
+    "blockquote",
+    "body",
+    "br",
+    "button",
+
+    "canvas",
+    "caption",
+    "cite",
+    "code",
+    "col",
+    "colgroup",
+
+    "data",
+    "datalist",
+    "dd",
+    "del",
+    "details",
+    "dfn",
+    "dialog",
+    "div",
+    "dl",
+    "dt",
+
+    "em",
+    "embed",
+
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "head",
+    "header",
+    "hgroup",
+    "hr",
+    "html",
+
+    "i",
+    "iframe",
+    "img",
+    "input",
+    "ins",
+
+    "kbd",
+
+    "label",
+    "legend",
+    "li",
+    "link",
+
+    "main",
+    "map",
+    "mark",
+    "menu",
+    "meta",
+    "meter",
+
+    "nav",
+    "noscript",
+
+    "object",
+    "ol",
+    "optgroup",
+    "option",
+    "output",
+
+    "p",
+    "picture",
+    "pre",
+    "progress",
+
+    "q",
+
+    "rp",
+    "rt",
+    "ruby",
+
+    "s",
+    "samp",
+    "script",
+    "search",
+    "section",
+    "select",
+    "selectedcontent",
+    "slot",
+    "small",
+    "source",
+    "span",
+    "strong",
+    "style",
+    "sub",
+    "summary",
+    "sup",
+
+    "table",
+    "tbody",
+    "td",
+    "template",
+    "textarea",
+    "tfoot",
+    "th",
+    "thead",
+    "time",
+    "title",
+    "tr",
+    "track",
+
+    "u",
+    "ul",
+
+    "var",
+    "video",
+
+    "wbr"
+];
+
+
+
+const globalAttributes = [
+    "accesskey",
+    "autocapitalize",
+    "autofocus",
+    "class",
+    "contenteditable",
+    "dir",
+    "draggable",
+    "enterkeyhint",
+    "hidden",
+    "id",
+    "inert",
+    "inputmode",
+    "is",
+    "itemid",
+    "itemprop",
+    "itemref",
+    "itemscope",
+    "itemtype",
+    "lang",
+    "nonce",
+    "part",
+    "popover",
+    "slot",
+    "spellcheck",
+    "style",
+    "tabindex",
+    "title",
+    "translate",
+
+    "aria-*",
+    "data-*"
+];
+
+
+
+const attributes = {
+
+    a: [
+        "download",
+        "href",
+        "hreflang",
+        "media",
+        "ping",
+        "referrerpolicy",
+        "rel",
+        "target",
+        "type"
+    ],
+
+    area: [
+        "alt",
+        "coords",
+        "download",
+        "href",
+        "hreflang",
+        "media",
+        "ping",
+        "referrerpolicy",
+        "rel",
+        "shape",
+        "target",
+        "type"
+    ],
+
+    audio: [
+        "autoplay",
+        "controls",
+        "crossorigin",
+        "loop",
+        "muted",
+        "preload",
+        "src"
+    ],
+
+    base: [
+        "href",
+        "target"
+    ],
+
+    blockquote: [
+        "cite"
+    ],
+
+    button: [
+        "autofocus",
+        "command",
+        "commandfor",
+        "disabled",
+        "form",
+        "formaction",
+        "formenctype",
+        "formmethod",
+        "formnovalidate",
+        "formtarget",
+        "name",
+        "popovertarget",
+        "popovertargetaction",
+        "type",
+        "value"
+    ],
+
+    canvas: [
+        "height",
+        "width"
+    ],
+
+    col: [
+        "span"
+    ],
+
+    colgroup: [
+        "span"
+    ],
+
+    data: [
+        "value"
+    ],
+
+    del: [
+        "cite",
+        "datetime"
+    ],
+
+    details: [
+        "name",
+        "open"
+    ],
+
+    dialog: [
+        "closedby",
+        "open"
+    ],
+
+    embed: [
+        "height",
+        "src",
+        "type",
+        "width"
+    ],
+
+    form: [
+        "accept-charset",
+        "action",
+        "autocomplete",
+        "enctype",
+        "method",
+        "name",
+        "novalidate",
+        "rel",
+        "target"
+    ],
+
+    html: [
+        "lang",
+        "xmlns"
+    ],
+
+    iframe: [
+        "allow",
+        "allowfullscreen",
+        "csp",
+        "height",
+        "loading",
+        "name",
+        "referrerpolicy",
+        "sandbox",
+        "src",
+        "srcdoc",
+        "width"
+    ],
+
+    img: [
+        "alt",
+        "crossorigin",
+        "decoding",
+        "elementtiming",
+        "fetchpriority",
+        "height",
+        "ismap",
+        "loading",
+        "referrerpolicy",
+        "sizes",
+        "src",
+        "srcset",
+        "usemap",
+        "width"
+    ],
+
+    input: [
+        "accept",
+        "alt",
+        "autocomplete",
+        "capture",
+        "checked",
+        "dirname",
+        "disabled",
+        "form",
+        "formaction",
+        "formenctype",
+        "formmethod",
+        "formnovalidate",
+        "formtarget",
+        "height",
+        "list",
+        "max",
+        "maxlength",
+        "min",
+        "minlength",
+        "multiple",
+        "name",
+        "pattern",
+        "placeholder",
+        "popovertarget",
+        "popovertargetaction",
+        "readonly",
+        "required",
+        "size",
+        "src",
+        "step",
+        "type",
+        "value",
+        "width"
+    ],
+
+    ins: [
+        "cite",
+        "datetime"
+    ],
+
+    label: [
+        "for",
+        "form"
+    ],
+
+    link: [
+        "as",
+        "blocking",
+        "color",
+        "crossorigin",
+        "disabled",
+        "fetchpriority",
+        "href",
+        "hreflang",
+        "imagesizes",
+        "imagesrcset",
+        "integrity",
+        "media",
+        "referrerpolicy",
+        "rel",
+        "sizes",
+        "title",
+        "type"
+    ],
+
+    map: [
+        "name"
+    ],
+
+    meta: [
+        "charset",
+        "content",
+        "http-equiv",
+        "media",
+        "name"
+    ],
+
+    meter: [
+        "high",
+        "low",
+        "max",
+        "min",
+        "optimum",
+        "value"
+    ],
+
+    object: [
+        "data",
+        "form",
+        "height",
+        "name",
+        "type",
+        "usemap",
+        "width"
+    ],
+
+    ol: [
+        "reversed",
+        "start",
+        "type"
+    ],
+
+    optgroup: [
+        "disabled",
+        "label"
+    ],
+
+    option: [
+        "disabled",
+        "label",
+        "selected",
+        "value"
+    ],
+
+    output: [
+        "for",
+        "form",
+        "name"
+    ],
+
+    progress: [
+        "max",
+        "value"
+    ],
+
+    q: [
+        "cite"
+    ],
+
+    script: [
+        "async",
+        "attributionsrc",
+        "blocking",
+        "crossorigin",
+        "defer",
+        "fetchpriority",
+        "integrity",
+        "nomodule",
+        "nonce",
+        "referrerpolicy",
+        "src",
+        "type"
+    ],
+
+    select: [
+        "autocomplete",
+        "autofocus",
+        "disabled",
+        "form",
+        "multiple",
+        "name",
+        "required",
+        "size"
+    ],
+
+    source: [
+        "height",
+        "media",
+        "sizes",
+        "src",
+        "srcset",
+        "type",
+        "width"
+    ],
+
+    style: [
+        "blocking",
+        "media",
+        "nonce",
+        "title"
+    ],
+
+    table: [
+        "align",
+        "border"
+    ],
+
+    td: [
+        "colspan",
+        "headers",
+        "rowspan"
+    ],
+
+    textarea: [
+        "autocomplete",
+        "autocorrect",
+        "cols",
+        "dirname",
+        "disabled",
+        "form",
+        "maxlength",
+        "minlength",
+        "name",
+        "placeholder",
+        "readonly",
+        "required",
+        "rows",
+        "spellcheck",
+        "wrap"
+    ],
+
+    th: [
+        "abbr",
+        "colspan",
+        "headers",
+        "rowspan",
+        "scope"
+    ],
+
+    time: [
+        "datetime"
+    ],
+
+    track: [
+        "default",
+        "kind",
+        "label",
+        "src",
+        "srclang"
+    ],
+
+    video: [
+        "autoplay",
+        "controls",
+        "crossorigin",
+        "height",
+        "loop",
+        "muted",
+        "playsinline",
+        "poster",
+        "preload",
+        "src",
+        "width"
+    ]
+};
+
+
+
+const tagTemplates = {
+
+    a: {
+        text: '<a href=""></a>',
+        cursor: 9
+    },
+
+    abbr: {
+        text: '<abbr title=""></abbr>',
+        cursor: 12
+    },
+
+    button: {
+        text: '<button type=""></button>',
+        cursor: 14
+    },
+
+    form: {
+        text: '<form action="" method=""></form>',
+        cursor: 13
+    },
+
+    img: {
+        text: '<img src="" alt="">',
+        cursor: 10
+    },
+
+    input: {
+        text: '<input type="" name="" id="">',
+        cursor: 13
+    },
+
+    iframe: {
+        text: '<iframe src="" title=""></iframe>',
+        cursor: 13
+    },
+
+    label: {
+        text: '<label for=""></label>',
+        cursor: 13
+    },
+
+    link: {
+        text: '<link rel="" href="">',
+        cursor: 11
+    },
+
+    meta: {
+        text: '<meta name="" content="">',
+        cursor: 11
+    },
+
+    option: {
+        text: '<option value=""></option>',
+        cursor: 15
+    },
+
+    script: {
+        text: '<script src=""></scr' + 'ipt>',
+        cursor: 13
+    },
+
+    source: {
+        text: '<source src="" type="">',
+        cursor: 13
+    },
+
+    textarea: {
+        text: '<textarea name="" id=""></textarea>',
+        cursor: 15
+    },
+
+    video: {
+        text: '<video src="" controls></video>',
+        cursor: 12
+    },
+
+    audio: {
+        text: '<audio src="" controls></audio>',
+        cursor: 12
+    }
+};
+
+
+
+const voidElements = new Set([
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "source",
+    "track",
+    "wbr"
+]);
+
+
+
+const textarea = document.getElementById("editor");
+const iframe = document.getElementById("preview");
+const autocomplete = document.getElementById("autocomplete");
+const mirror = document.getElementById("mirror");
+
+
+let selectedIndex = 0;
+let currentResults = [];
+let currentMode = null;
+
+
+
+function updatePreview() {
+    iframe.srcdoc = textarea.value;
+}
+
+
+
+function getCursorPosition() {
+
+    const style =
+        window.getComputedStyle(textarea);
+
+    mirror.style.width =
+        textarea.clientWidth + "px";
+
+    mirror.style.fontFamily =
+        style.fontFamily;
+
+    mirror.style.fontSize =
+        style.fontSize;
+
+    mirror.style.fontWeight =
+        style.fontWeight;
+
+    mirror.style.lineHeight =
+        style.lineHeight;
+
+    mirror.style.letterSpacing =
+        style.letterSpacing;
+
+    mirror.style.padding =
+        style.padding;
+
+    mirror.style.border =
+        style.border;
+
+    mirror.scrollTop = textarea.scrollTop;
+
+    const cursor =
+        textarea.selectionStart;
+
+    const text =
+        textarea.value.substring(0, cursor);
+
+    mirror.textContent = text;
+
+    const span =
+        document.createElement("span");
+
+    span.textContent = "|";
+
+    mirror.appendChild(span);
+
+    const rect =
+        span.getBoundingClientRect();
+
+    const mirrorRect =
+        mirror.getBoundingClientRect();
+
+    return {
+        left:
+            rect.left -
+            mirrorRect.left -
+            textarea.scrollLeft,
+
+        top:
+            rect.top -
+            mirrorRect.top -
+            textarea.scrollTop
+    };
+}
+
+
+
+function positionAutocomplete() {
+
+    const cursor =
+        getCursorPosition();
+
+    const style =
+        window.getComputedStyle(textarea);
+
+    const lineHeight =
+        parseFloat(style.lineHeight) || 24;
+
+    let left =
+        cursor.left + 15;
+
+    let top =
+        cursor.top + lineHeight + 15;
+
+    const maxLeft =
+        textarea.clientWidth -
+        autocomplete.offsetWidth -
+        8;
+
+    if (left > maxLeft) {
+        left = Math.max(5, maxLeft);
     }
 
-    // Update de preview wanneer op de knop wordt geklikt
-    document.getElementById('run-btn').addEventListener('click', updatePreview);
 
-    // Update de preview automatisch als de pagina laadt
-    window.addEventListener('load', updatePreview);
-  </script> 
+    const maxTop =
+        textarea.clientHeight -
+        autocomplete.offsetHeight -
+        8;
+
+    if (top > maxTop) {
+
+        top =
+            cursor.top -
+            autocomplete.offsetHeight +
+            10;
+    }
+
+    autocomplete.style.left =
+        left + "px";
+
+    autocomplete.style.top =
+        top + "px";
+}
+
+
+
+function getCurrentTag() {
+
+    const cursor =
+        textarea.selectionStart;
+
+    const before =
+        textarea.value.substring(0, cursor);
+
+
+    const match =
+        before.match(/<([a-zA-Z][a-zA-Z0-9-]*)\s+[^<>]*$/);
+
+    if (match) {
+        return match[1].toLowerCase();
+    }
+
+
+    const simpleMatch =
+        before.match(/<([a-zA-Z][a-zA-Z0-9-]*)[^<>]*$/);
+
+    if (simpleMatch) {
+        return simpleMatch[1].toLowerCase();
+    }
+
+    return null;
+}
+
+
+
+function getAttributeContext() {
+
+    const cursor = textarea.selectionStart;
+
+    const before =
+        textarea.value.substring(0, cursor);
+
+    const tagStart =
+        before.lastIndexOf("<");
+
+    if (tagStart === -1) {
+        return null;
+    }
+
+    const tagContent =
+        before.substring(tagStart + 1);
+
+    if (tagContent.includes(">")) {
+        return null;
+    }
+
+    if (tagContent.startsWith("/")) {
+        return null;
+    }
+
+    const tagMatch =
+        tagContent.match(
+            /^([a-zA-Z][a-zA-Z0-9-]*)/
+        );
+
+    if (!tagMatch) {
+        return null;
+    }
+
+    const tagName =
+        tagMatch[1].toLowerCase();
+
+    const afterTag =
+        tagContent.substring(
+            tagMatch[0].length
+        );
+
+    if (!/\s/.test(afterTag)) {
+        return null;
+    }
+
+
+    let insideDoubleQuote = false;
+    let insideSingleQuote = false;
+
+    for (const char of afterTag) {
+
+        if (
+            char === '"' &&
+            !insideSingleQuote
+        ) {
+            insideDoubleQuote =
+                !insideDoubleQuote;
+        }
+
+        if (
+            char === "'" &&
+            !insideDoubleQuote
+        ) {
+            insideSingleQuote =
+                !insideSingleQuote;
+        }
+    }
+
+    if (
+        insideDoubleQuote ||
+        insideSingleQuote
+    ) {
+        return null;
+    }
+
+
+    const partialMatch =
+        afterTag.match(
+            /(?:^|\s)([a-zA-Z_:][a-zA-Z0-9_:-]*)$/
+        );
+
+    const partialAttribute =
+        partialMatch
+            ? partialMatch[1]
+            : "";
+
+
+    return {
+        tagName,
+        partialAttribute
+    };
+}
+
+
+function getAttributesForTag(tagName) {
+
+    const specific =
+        attributes[tagName] || [];
+
+    return [
+        ...specific,
+        ...globalAttributes
+    ];
+}
+
+
+
+function getTagSuggestions() {
+
+    const cursor =
+        textarea.selectionStart;
+
+    const before =
+        textarea.value.substring(0, cursor);
+
+
+    const match =
+        before.match(/<([a-zA-Z0-9-]*)$/);
+
+    if (!match) {
+        return null;
+    }
+
+    const query =
+        match[1].toLowerCase();
+
+    const results =
+        htmlElements
+            .filter(tag =>
+                tag.startsWith(query)
+            )
+            .map(tag => `<${tag}>`);
+
+    return {
+        results,
+        query
+    };
+}
+
+
+
+function getAttributeSuggestions() {
+
+    const context =
+        getAttributeContext();
+
+    if (!context) {
+        return null;
+    }
+
+    const {
+        tagName,
+        partialAttribute
+    } = context;
+
+    const query =
+        partialAttribute.toLowerCase();
+
+    const available =
+        getAttributesForTag(tagName);
+
+    const results =
+        available
+            .filter(attribute =>
+                attribute.toLowerCase().startsWith(query)
+            )
+            .filter(
+                (attribute, index, array) =>
+                    array.indexOf(attribute) === index
+            );
+
+    return {
+        results,
+        tagName,
+        query
+    };
+}
+
+
+
+function showAutocomplete() {
+
+
+    const attributeData =
+        getAttributeSuggestions();
+
+    if (
+        attributeData &&
+        attributeData.results.length > 0
+    ) {
+
+        currentMode = "attribute";
+
+        currentResults =
+            attributeData.results;
+
+        updateSuggestions();
+
+        return;
+    }
+
+
+
+    const tagData =
+        getTagSuggestions();
+
+    if (
+        tagData &&
+        tagData.results.length > 0
+    ) {
+
+        currentMode = "tag";
+
+        currentResults =
+            tagData.results;
+
+        updateSuggestions();
+
+        return;
+    }
+
+
+    hideAutocomplete();
+}
+
+
+
+function updateSuggestions() {
+
+
+    if (!autocomplete.dataset.mode ||
+        autocomplete.dataset.mode !== currentMode) {
+
+        selectedIndex = 0;
+
+    }
+
+    autocomplete.dataset.mode =
+        currentMode;
+
+
+    if (
+        selectedIndex >= currentResults.length
+    ) {
+        selectedIndex = 0;
+    }
+
+    renderSuggestions();
+
+    autocomplete.style.display =
+        "block";
+
+    positionAutocomplete();
+}
+
+
+
+function renderSuggestions() {
+
+    autocomplete.innerHTML = "";
+
+
+    currentResults.forEach(
+        (suggestion, index) => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "suggestion";
+
+            if (
+                index === selectedIndex
+            ) {
+                item.classList.add("active");
+            }
+
+            item.textContent =
+                currentMode === "attribute"
+                    ? suggestion
+                    : suggestion;
+
+            item.addEventListener(
+                "mousedown",
+                event => {
+
+                    event.preventDefault();
+
+                    selectSuggestion(
+                        suggestion
+                    );
+                }
+            );
+
+            autocomplete.appendChild(item);
+        }
+    );
+
+    scrollToSelected();
+}
+
+
+
+function scrollToSelected() {
+
+    const items =
+        autocomplete.querySelectorAll(
+            ".suggestion"
+        );
+
+    if (!items[selectedIndex]) {
+        return;
+    }
+
+    items[selectedIndex].scrollIntoView({
+        block: "nearest"
+    });
+}
+
+
+
+function selectTag(tag) {
+
+    const cursor =
+        textarea.selectionStart;
+
+    const before =
+        textarea.value.substring(0, cursor);
+
+    const match =
+        before.match(/<([a-zA-Z0-9-]*)$/);
+
+    if (!match) {
+        return;
+    }
+
+    const start =
+        cursor - match[0].length;
+
+    const tagName =
+        tag
+            .replace("<", "")
+            .replace(">", "")
+            .toLowerCase();
+
+
+
+    if (tagTemplates[tagName]) {
+
+        const template =
+            tagTemplates[tagName];
+
+        const insertion =
+            template.text;
+
+        textarea.value =
+            textarea.value.substring(0, start) +
+            insertion +
+            textarea.value.substring(cursor);
+
+        const newCursor =
+            start + template.cursor;
+
+        textarea.selectionStart =
+            newCursor;
+
+        textarea.selectionEnd =
+            newCursor;
+
+    } else {
+
+
+        let insertion;
+        let newCursor;
+
+        if (voidElements.has(tagName)) {
+
+            insertion =
+                `<${tagName}>`;
+
+            newCursor =
+                start +
+                insertion.length;
+
+        } else {
+
+            insertion =
+                `<${tagName}></${tagName}>`;
+
+            newCursor =
+                start +
+                tagName.length +
+                2;
+        }
+
+        textarea.value =
+            textarea.value.substring(0, start) +
+            insertion +
+            textarea.value.substring(cursor);
+
+        textarea.selectionStart =
+            newCursor;
+
+        textarea.selectionEnd =
+            newCursor;
+    }
+
+    hideAutocomplete();
+
+    updatePreview();
+
+    textarea.focus();
+}
+
+
+
+function selectAttribute(attribute) {
+
+    const cursor =
+        textarea.selectionStart;
+
+    const before =
+        textarea.value.substring(0, cursor);
+
+
+    const match =
+        before.match(
+            /([a-zA-Z_:][a-zA-Z0-9_:-]*)$/
+        );
+
+    if (!match) {
+        return;
+    }
+
+    const start =
+        cursor - match[0].length;
+
+
+
+    const booleanAttributes = new Set([
+        "autofocus",
+        "autoplay",
+        "checked",
+        "controls",
+        "default",
+        "defer",
+        "disabled",
+        "hidden",
+        "inert",
+        "ismap",
+        "itemscope",
+        "loop",
+        "multiple",
+        "muted",
+        "nomodule",
+        "novalidate",
+        "open",
+        "playsinline",
+        "readonly",
+        "required",
+        "reversed"
+    ]);
+
+
+
+    const needsValue =
+        !booleanAttributes.has(attribute);
+
+
+    let insertion;
+    let newCursor;
+
+
+    if (needsValue) {
+
+        insertion =
+            `${attribute}=""`;
+
+
+        newCursor =
+            start +
+            attribute.length +
+            2;
+
+    } else {
+
+        insertion =
+            attribute;
+
+        newCursor =
+            start +
+            attribute.length;
+    }
+
+
+    textarea.value =
+        textarea.value.substring(0, start) +
+        insertion +
+        textarea.value.substring(cursor);
+
+    textarea.selectionStart =
+        newCursor;
+
+    textarea.selectionEnd =
+        newCursor;
+
+
+    hideAutocomplete();
+
+    updatePreview();
+
+    textarea.focus();
+}
+
+
+
+function selectSuggestion(suggestion) {
+
+    if (currentMode === "tag") {
+
+        selectTag(suggestion);
+
+    } else if (currentMode === "attribute") {
+
+        selectAttribute(suggestion);
+    }
+}
+
+
+
+function hideAutocomplete() {
+
+    autocomplete.style.display =
+        "none";
+
+    autocomplete.innerHTML = "";
+
+    currentResults = [];
+
+    currentMode = null;
+
+    autocomplete.dataset.mode = "";
+}
+
+
+
+textarea.addEventListener("keydown", event => {
+
+
+    if (event.key === "Tab") {
+
+        if (
+            autocomplete.style.display === "block" &&
+            currentResults.length > 0
+        ) {
+            event.preventDefault();
+
+            selectSuggestion(
+                currentResults[selectedIndex]
+            );
+
+            return;
+        }
+
+
+        event.preventDefault();
+
+        const start =
+            textarea.selectionStart;
+
+        const end =
+            textarea.selectionEnd;
+
+        textarea.value =
+            textarea.value.substring(0, start) +
+            "    " +
+            textarea.value.substring(end);
+
+
+        textarea.selectionStart =
+            start + 4;
+
+        textarea.selectionEnd =
+            start + 4;
+
+        updatePreview();
+
+        return;
+    }
+
+
+
+    if (
+        autocomplete.style.display !== "block" ||
+        currentResults.length === 0
+    ) {
+        return;
+    }
+
+
+
+    if (event.key === "ArrowDown") {
+
+        event.preventDefault();
+
+        selectedIndex++;
+
+        if (
+            selectedIndex >=
+            currentResults.length
+        ) {
+            selectedIndex = 0;
+        }
+
+        renderSuggestions();
+
+        return;
+    }
+
+
+
+    if (event.key === "ArrowUp") {
+
+        event.preventDefault();
+
+        selectedIndex--;
+
+        if (selectedIndex < 0) {
+            selectedIndex =
+                currentResults.length - 1;
+        }
+
+        renderSuggestions();
+
+        return;
+    }
+
+
+
+    if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        if (
+            currentResults[selectedIndex]
+        ) {
+            selectSuggestion(
+                currentResults[selectedIndex]
+            );
+        }
+
+        return;
+    }
+
+
+
+    if (event.key === "Escape") {
+
+        event.preventDefault();
+
+        hideAutocomplete();
+
+        return;
+    }
+});
+
+
+textarea.addEventListener(
+    "input",
+    () => {
+
+        updatePreview();
+
+
+        selectedIndex = 0;
+
+        showAutocomplete();
+    }
+);
+
+
+
+textarea.addEventListener(
+    "click",
+    () => {
+
+        selectedIndex = 0;
+
+        showAutocomplete();
+    }
+);
+
+
+
+textarea.addEventListener(
+    "keyup",
+    event => {
+
+
+        if (
+            event.key !== "ArrowUp" &&
+            event.key !== "ArrowDown"
+        ) {
+
+            showAutocomplete();
+        }
+    }
+);
+
+
+
+textarea.addEventListener(
+    "scroll",
+    () => {
+
+        if (
+            autocomplete.style.display ===
+            "block"
+        ) {
+
+            positionAutocomplete();
+        }
+    }
+);
+
+
+
+textarea.addEventListener(
+    "focus",
+    () => {
+
+        showAutocomplete();
+    }
+);
+
+
+
+updatePreview();
+
+</script>
+
 </body>
 </html>
