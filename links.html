@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WesMeer Portfolio</title>
+    <title>Linktree - WesMeer Portfolio</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <script
       async
@@ -134,7 +134,7 @@
         background-image: url("stone.png");
         background-repeat: repeat;
         background-size: 2000px;
-        min-height: 500px;
+        min-height: 200px;
       }
       .bedrock-box {
         background-image: url("bedrock.png");
@@ -399,7 +399,7 @@
         height: 100%;
         width: 0;
         position: fixed;
-        z-index: 100;
+        z-index: 5;
         top: 0;
         left: 0;
         background-color: #111;
@@ -408,6 +408,7 @@
         padding-top: 60px;
         text-align: center;
       }
+
       .sidenav a {
         padding: 8px 8px 8px 32px;
         text-decoration: none;
@@ -416,15 +417,26 @@
         display: block;
         transition: 0.3s;
       }
+
       .sidenav a:hover {
         color: #f1f1f1;
       }
+
       .sidenav .closebtn {
         position: absolute;
         top: 0;
         right: 25px;
         font-size: 36px;
         margin-left: 50px;
+      }
+
+      @media screen and (max-height: 450px) {
+        .sidenav {
+          padding-top: 15px;
+        }
+        .sidenav a {
+          font-size: 18px;
+        }
       }
     </style>
   </head>
@@ -449,7 +461,7 @@
       >&#9776; open</span
     >
     <header>
-      <h1>WESMEER</h1>
+      <h1>Linktree</h1>
       <div class="splash-container">
         <span class="splash-text" id="splashText"
           >Subscribe to me on YouTube!</span
@@ -462,18 +474,7 @@
     <div class="block-container">
       <section class="section-block dirt-box">
         <div class="section-content">
-          <h2><span>🧭</span> About me</h2>
-          <p>
-            Hello reader, I am WesMeer. A Minecraft YouTuber who also likes
-            programming.
-          </p>
-          <p>I like programming in: Python, Lua, HTML+CSS</p>
-        </div>
-      </section>
-      <section class="section-block stone-box" id="miningArea">
-        <div class="section-content">
-          <h2><span>⛏️</span> Links</h2>
-          <p>Socials:</p>
+          <h2><span>🌐</span> Socials</h2>
           <p>
             ▶️
             <a href="https://www.youtube.com/@WesMeer" target="_blank"
@@ -492,8 +493,11 @@
               >Reddit</a
             >
           </p>
-          <br />
-          <p>Mods:</p>
+        </div>
+      </section>
+      <section class="section-block stone-box" id="miningArea">
+        <div class="section-content">
+          <h2><span>⛏️</span> Mods</h2>
           <p>
             💪
             <a href="https://curseforge.com/members/wesmeer" target="_blank"
@@ -510,90 +514,6 @@
               >PlanetMinecraft</a
             >
           </p>
-        </div>
-      </section>
-      <section class="section-block bedrock-box">
-        <div class="section-content">
-          <h2><span>🧱</span> Projects</h2>
-          <div id="latest-video-container">
-            <p>Loading Latest Video...</p>
-          </div>
-          <details>
-            <summary><h2>Web Tools:</h2></summary>
-            <img
-              width="100%"
-              style="max-width: 500px; border: 4px solid #000; margin-top: 10px"
-              src="parkour.png"
-              alt="YouTube Banner"
-            />
-            <h1 style="margin-top: 15px">
-              <a href="parkour">Parkour Short Generator</a>
-            </h1>
-            <p>
-              Create some Shorts/TikToks with Minecraft Parkour on the
-              background and Text To Speech Voices!
-            </p>
-            <hr />
-            <img
-              width="100%"
-              style="max-width: 500px; border: 4px solid #000; margin-top: 10px"
-              src="chatcity.png"
-              alt="YouTube Banner"
-            />
-            <h1 style="margin-top: 15px">
-              <a href="Chat City">Parkour Short Generator</a>
-            </h1>
-            <p>
-              Visualize your Twitch viewers as Pixelated characters in a
-              Pixelated world! You can see the Chats and the usernames of your
-              viewers. You can also use it as a stream overlay in OBS if you
-              change the setting or put /?obs=true behind the URL.
-            </p>
-            <hr />
-
-            <img
-              width="100%"
-              style="max-width: 500px; border: 4px solid #000; margin-top: 10px"
-              src="htmlp.png"
-              alt="YouTube Banner"
-            />
-            <h1 style="margin-top: 15px">
-              <a href="html-playground.html">HTML Playground</a>
-            </h1>
-            <p>
-              Run your code without making a new file on your pc. All the code
-              is sanboxed on the site, so it won't affect your device.
-            </p>
-            <hr />
-            <img
-              width="100%"
-              style="max-width: 500px; border: 4px solid #000; margin-top: 10px"
-              src="t2d.png"
-              alt="YouTube Banner"
-            />
-            <h1 style="margin-top: 15px">
-              <a href="tilt2download.html">Tilt2Download</a>
-            </h1>
-            <p>
-              This site uses your gyroscope to make the progressbar progress
-              more using 'gravity'. You'll need a Gyroscope in your Laptop/Phone
-              to use this! It's just a Prank, it doesn't download anything...
-            </p>
-          </details>
-          <details>
-            <summary><h2>Art:</h2></summary>
-            <img
-              width="100%"
-              style="max-width: 500px; border: 4px solid #000; margin-top: 10px"
-              src="banner.png"
-              alt="YouTube Banner"
-            />
-            <h1 style="margin-top: 15px">YouTube Banner</h1>
-            <p>
-              Background from Nova Skin.<br />I did the color correction in
-              Photopea.<br />And the text did I make in Blockbench.
-            </p>
-          </details>
         </div>
       </section>
       <div id="enchantContainer" class="enchant-container">
@@ -710,7 +630,7 @@
       }
       function spawnOres() {
         const area = document.getElementById("miningArea");
-        const amount = Math.floor(Math.random() * 8) + 10;
+        const amount = Math.floor(Math.random() * 8) + 2;
         const placedOres = [];
         const minDistance = 75;
         for (let i = 0; i < amount; i++) {

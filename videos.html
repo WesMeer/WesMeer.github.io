@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WesMeer Portfolio - Videos</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QQ465WLE0C"
+    ></script>
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QQ465WLE0C");
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+      :root {
+        --xp-color: #76ff03;
+        --mc-shadow: rgba(0, 0, 0, 0.6);
+        --tooltip-border: #2e0854;
+        --tooltip-bg: #100110;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        image-rendering: pixelated;
+      }
+      body {
+        font-family: "VT323", monospace;
+        background-color: #313131;
+        background-image:
+          linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+          url("background.jpg");
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        color: white;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+      header {
+        text-align: center;
+        padding: 80px 20px 40px 20px;
+        position: relative;
+      }
+      header h1 {
+        font-size: 8rem;
+        text-shadow: 10px 10px 0px #000;
+        letter-spacing: 5px;
+        position: relative;
+        z-index: 2;
+        transition: transform 0.2s ease;
+      }
+      header h1:hover {
+        transform: scale(1.02);
+      }
+      .splash-container {
+        position: absolute;
+        top: 70%;
+        left: 55%;
+        transform: rotate(-20deg);
+        z-index: 3;
+        pointer-events: none;
+        transform-origin: center;
+      }
+      .splash-text {
+        display: inline-block;
+        color: #ffff55;
+        font-size: 2.5rem;
+        text-shadow: 3px 3px 0 #000;
+        animation: splashPulse 0.5s infinite alternate ease-in-out;
+        white-space: nowrap;
+      }
+      @keyframes splashPulse {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.15);
+        }
+      }
+      .block-container {
+        width: 90%;
+        max-width: 900px;
+        margin: 0 auto 100px auto;
+      }
+      .section-block {
+        border: 8px solid #000;
+        margin-bottom: 80px;
+        box-shadow: 20px 20px 0px var(--mc-shadow);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .section-block:hover {
+        transform: translate(-5px, -5px);
+      }
+      .dirt-box {
+        background-image: url("dirt.png");
+        background-repeat: repeat;
+        background-size: 2000px;
+        padding-top: 50px;
+      }
+      .dirt-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 48px;
+        background-image: url("grass_block.webp");
+        background-repeat: repeat-x;
+        background-size: contain;
+        z-index: 1;
+        border-bottom: 4px solid #000;
+      }
+      .stone-box {
+        background-image: url("stone.png");
+        background-repeat: repeat;
+        background-size: 2000px;
+        min-height: 500px;
+      }
+      .bedrock-box {
+        background-image: url("bedrock.png");
+        background-repeat: repeat;
+        background-size: 2000px;
+      }
+      .section-content {
+        padding: 50px;
+        background-color: rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 10;
+        pointer-events: none;
+      }
+      .section-content h2,
+      .section-content p,
+      .g-ytsubscribe,
+      iframe,
+      .video-card {
+        pointer-events: auto !important;
+      }
+
+      h2 {
+        font-size: 4rem;
+        text-shadow: 4px 4px 0px #000;
+        margin-bottom: 30px;
+        border-bottom: 4px solid #fff;
+        display: inline-block;
+        padding-bottom: 10px;
+      }
+
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+      }
+      .video-card {
+        background: rgba(0, 0, 0, 0.6);
+        border: 4px solid #000;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+      }
+      .video-card:hover {
+        border-color: var(--xp-color);
+      }
+      .thumb-container {
+        width: 100%;
+        aspect-ratio: 16/9;
+        overflow: hidden;
+        border-bottom: 4px solid #000;
+      }
+      .video-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .video-card-info {
+        padding: 10px;
+      }
+      .video-card-info h3 {
+        font-size: 1.4rem;
+        color: #fff;
+        line-height: 1.2;
+        height: 3.4rem;
+        overflow: hidden;
+      }
+
+      .ore {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        cursor: pointer;
+        z-index: 5;
+        transition: transform 0.1s;
+        pointer-events: auto !important;
+      }
+      .ore:hover {
+        transform: scale(1.1);
+        filter: brightness(1.2);
+      }
+      .ore.mined {
+        animation: mineAnim 0.3s forwards;
+      }
+      @keyframes mineAnim {
+        0% {
+          transform: scale(1.1) rotate(0);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2) rotate(15deg);
+        }
+        100% {
+          transform: scale(0) rotate(-30deg);
+          opacity: 0;
+        }
+      }
+      .particle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: #555;
+        pointer-events: none;
+        z-index: 15;
+      }
+      .xp-orb {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        pointer-events: none;
+        z-index: 20;
+        animation: orbPop 1.2s forwards ease-out;
+      }
+      @keyframes orbPop {
+        0% {
+          transform: translate(0, 0) scale(0.2) rotate(0);
+          opacity: 0;
+        }
+        20% {
+          transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(45deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--dx), calc(var(--dy) - 100px)) scale(0.6)
+            rotate(180deg);
+          opacity: 0;
+        }
+      }
+
+      .enchant-container {
+        text-align: center;
+        margin: 50px auto;
+        display: none;
+        animation: enchantPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      @keyframes enchantPop {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .enchanting-table {
+        width: 128px;
+        height: 128px;
+        animation: floatTable 3s infinite ease-in-out;
+        filter: drop-shadow(0 0 15px rgba(118, 255, 3, 0.4));
+      }
+      @keyframes floatTable {
+        0%,
+        100% {
+          transform: translateY(30px);
+        }
+        50% {
+          transform: translateY(15px);
+        }
+      }
+
+      .hud {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        text-align: center;
+      }
+      .xp-container {
+        width: 400px;
+        height: 14px;
+        background: #1a1a1a;
+        border: 3px solid #000;
+        position: relative;
+      }
+      .xp-fill {
+        width: 0%;
+        height: 100%;
+        background: var(--xp-color);
+        transition: width 0.3s ease;
+      }
+      .xp-level {
+        position: absolute;
+        top: -24px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--xp-color);
+        font-size: 1.8rem;
+        text-shadow: 2px 2px 0 #000;
+      }
+
+      .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        text-align: center;
+      }
+      .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+      }
+      .sidenav a:hover {
+        color: #f1f1f1;
+      }
+      .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+      }
+
+      footer {
+        background: #000;
+        padding: 50px 20px;
+        text-align: center;
+      }
+      footer p {
+        font-size: 1.5rem;
+      }
+
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 4rem;
+        }
+        .splash-text {
+          font-size: 1.2rem;
+        }
+        .xp-container {
+          width: 250px;
+        }
+        .section-content {
+          padding: 20px;
+        }
+        h2 {
+          font-size: 2.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mySidenav" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"
+        >&times;</a
+      >
+      <a href="index.html">Home</a>
+      <a href="links.html">Linktree</a>
+      <a href="videos.html">Videos</a>
+      <a href="projects.html">Projects</a>
+    </div>
+
+    <span
+      style="
+        font-size: 30px;
+        cursor: pointer;
+        padding: 20px;
+        display: inline-block;
+      "
+      onclick="openNav()"
+      >&#9776; open</span
+    >
+
+    <header>
+      <h1>WESMEER</h1>
+      <div class="splash-container">
+        <span class="splash-text" id="splashText"
+          >Subscribe to me on YouTube!</span
+        >
+      </div>
+    </header>
+
+    <div class="block-container">
+      <section class="section-block dirt-box">
+        <div class="section-content">
+          <h2><span>🔴</span> Subscribe</h2>
+          <br />
+          <div
+            class="g-ytsubscribe"
+            data-channelid="UCrNQ6kxcTMwii3P044nDzwg"
+            data-layout="full"
+            data-theme="dark"
+            data-count="default"
+          ></div>
+        </div>
+      </section>
+
+      <section class="section-block stone-box" id="miningArea">
+        <div class="section-content">
+          <h2><span>🎥</span> Latest Video</h2>
+          <div id="main-video" style="text-align: center">Laden...</div>
+        </div>
+      </section>
+
+      <section class="section-block bedrock-box">
+        <div class="section-content">
+          <h2><span>📂</span> All Videos</h2>
+          <div id="video-grid" class="video-grid">Laden...</div>
+        </div>
+      </section>
+
+      <div id="enchantContainer" class="enchant-container">
+        <h2 style="border: none; margin-bottom: 10px">
+          ENCHANTING TABLE UNLOCKED!
+        </h2>
+        <img
+          src="enchantingtable.webp"
+          class="enchanting-table"
+          alt="Enchanting Table"
+        />
+        <p style="color: #aa00aa; text-shadow: 1px 1px #000"></p>
+      </div>
+    </div>
+
+    <div class="hud">
+      <div class="xp-container">
+        <div class="xp-level" id="levelCount">1</div>
+        <div id="xpFill" class="xp-fill"></div>
+      </div>
+      <div style="margin-top: 5px; color: #ff5555; font-size: 1.8rem">
+        ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+      </div>
+    </div>
+
+    <footer>
+      <p>WesMeer Portfolio - <span id="year"></span></p>
+      <p style="opacity: 0.5; margin-top: 10px">
+        © WesMeer | Digging through code.
+      </p>
+    </footer>
+
+    <script>
+      function openNav() {
+        document.getElementById("mySidenav").style.width = "100%";
+      }
+      function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+      }
+
+      // YouTube Feed[cite: 6]
+      const channelID = "UCrNQ6kxcTMwii3P044nDzwg";
+      const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelID}`;
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+      fetch(apiUrl)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.items) {
+            const normalVideos = data.items.filter((item) => {
+              const t = item.title.toLowerCase();
+              return !t.includes("#shorts") && !t.includes("short");
+            });
+
+            let gridHtml = "";
+            normalVideos.forEach((item, index) => {
+              const vidId = item.link.split("v=")[1];
+              const thumb = `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`;
+              const formattedDate = new Date(item.pubDate).toLocaleDateString(
+                "en-US",
+                { year: "numeric", month: "long", day: "numeric" },
+              );
+              if (index === 0) {
+                document.getElementById("main-video").innerHTML = `
+                            <iframe width="100%" height="315" style="max-width: 500px; border: 4px solid #000;" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>
+                            <h3 style="font-size: 2rem; color: #ffff55; margin-top: 15px;">${item.title}</h3>`;
+              }
+
+              gridHtml += `
+                        <div class="video-card" onclick="window.open('${item.link}', '_blank')" 
+                            onmouseenter="loadPreview(this, '${vidId}')" 
+                            onmouseleave="unloadPreview(this)">
+                            <div class="thumb-container" style="position: relative; overflow: hidden; height: 100%; background: #000;">
+                                <img src="${thumb}" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.5s;">
+                                
+                                <div class="preview-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease-in-out; z-index: 1;">
+                                    <!-- HET SCHILD: Blokkeert alle YT-interactie -->
+                                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: pointer;"></div>
+                                    
+                                    <!-- CONTAINER: Met extra transitie voor de video zelf -->
+                                    <div class="iframe-container" style="width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s;"></div>
+                                </div>
+                            </div>
+                            <div class="video-card-info">
+                                <h3>${item.title}</h3>
+                                <div style="color:#aaa; font-size:0.9rem; margin-top:5px;">📅 ${formattedDate}</div>
+                            </div>
+                        </div>`;
+            });
+            document.getElementById("video-grid").innerHTML = gridHtml;
+          }
+        });
+
+      function loadPreview(element, vidId) {
+        const container = element.querySelector(".iframe-container");
+        const overlay = element.querySelector(".preview-overlay");
+        const img = element.querySelector("img");
+
+        // Maak de iframe aan
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${vidId}&modestbranding=1&disablekb=1&rel=0&start=10`;
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.transform = "scale(1.4)";
+        iframe.style.pointerEvents = "none";
+
+        // Fade in zodra de data geladen is
+        iframe.onload = function () {
+          container.style.opacity = "1";
+        };
+
+        container.appendChild(iframe);
+        overlay.style.opacity = "1";
+        img.style.filter = "blur(4px) brightness(0.5)"; // Optioneel: vervaag de thumbnail tijdens preview
+      }
+
+      function unloadPreview(element) {
+        const container = element.querySelector(".iframe-container");
+        const overlay = element.querySelector(".preview-overlay");
+        const img = element.querySelector("img");
+
+        overlay.style.opacity = "0";
+        container.style.opacity = "0";
+        img.style.filter = "none";
+
+        // Verwijder de iframe pas na de animatie om haperen te voorkomen
+        setTimeout(() => {
+          container.innerHTML = "";
+        }, 800);
+      }
+
+      // Mining System & Splashes[cite: 6]
+      const oreFiles = [
+        "ores/coal.webp",
+        "ores/copper.webp",
+        "ores/diamond.webp",
+        "ores/emerald.webp",
+        "ores/gold.webp",
+        "ores/iron.webp",
+        "ores/lapis.webp",
+        "ores/redstone.webp",
+      ];
+      const splashes = [
+        "Subscribe on YouTube!",
+        "Follow on Instagram!",
+        "Don't dig straight down!",
+        "Developing some fun!",
+        "Crafting Solutions!",
+        "Error 418: I'm a teapot",
+        "Error 404: Not found",
+        "Minecraft > Roblox",
+        "Meow...",
+        "Hrmm... Villager approved!",
+        "Never gonna give you up!",
+        "Minceraft",
+        "Easter Egg, I guess",
+        "As seen on YouTube!",
+        "print('hello world')",
+        "Hello World",
+        "Jeb_",
+        "Dinnerbone",
+        "Grumm",
+        "Toast",
+        "Join the Reddit Community!",
+        "Like that smash button!",
+        "what does the fox say?",
+      ];
+
+      let currentXPLevel = 1;
+      const startLevel = 1;
+
+      function createParticles(x, y) {
+        const area = document.getElementById("miningArea");
+        for (let i = 0; i < 8; i++) {
+          const p = document.createElement("div");
+          p.className = "particle";
+          p.style.left = x + "px";
+          p.style.top = y + "px";
+          area.appendChild(p);
+          const angle = Math.random() * Math.PI * 2,
+            speed = Math.random() * 5 + 2;
+          const vx = Math.cos(angle) * speed,
+            vy = Math.sin(angle) * speed;
+          let life = 1;
+          const interval = setInterval(() => {
+            p.style.left = parseFloat(p.style.left) + vx + "px";
+            p.style.top = parseFloat(p.style.top) + vy + "px";
+            life -= 0.05;
+            p.style.opacity = life;
+            if (life <= 0) {
+              clearInterval(interval);
+              p.remove();
+            }
+          }, 30);
+        }
+      }
+
+      function dropXPOrb(x, y) {
+        const area = document.getElementById("miningArea");
+        for (let i = 0; i < 2; i++) {
+          const orb = document.createElement("img");
+          orb.src = "xp.webp";
+          orb.className = "xp-orb";
+          orb.style.setProperty("--dx", (Math.random() - 0.5) * 100 + "px");
+          orb.style.setProperty("--dy", (Math.random() - 0.5) * 100 + "px");
+          orb.style.left = x + "px";
+          orb.style.top = y + "px";
+          area.appendChild(orb);
+          setTimeout(() => orb.remove(), 1200);
+        }
+      }
+
+      function spawnOres() {
+        const area = document.getElementById("miningArea");
+        const amount = 15;
+        const placedOres = [];
+        const minDistance = 70;
+
+        for (let i = 0; i < amount; i++) {
+          let x,
+            y,
+            overlap = false,
+            attempts = 0;
+          do {
+            overlap = false;
+            x = Math.random() * (area.offsetWidth - 80);
+            y = Math.random() * (area.offsetHeight - 80);
+            attempts++;
+            for (let placed of placedOres) {
+              const dist = Math.sqrt(
+                Math.pow(x - placed.x, 2) + Math.pow(y - placed.y, 2),
+              );
+              if (dist < minDistance) {
+                overlap = true;
+                break;
+              }
+            }
+          } while (overlap && attempts < 100);
+
+          if (!overlap) {
+            placedOres.push({ x, y });
+            const ore = document.createElement("img");
+            ore.src = oreFiles[Math.floor(Math.random() * oreFiles.length)];
+            ore.className = "ore";
+            ore.style.left = x + "px";
+            ore.style.top = y + "px";
+            ore.onclick = function (e) {
+              if (this.classList.contains("mined")) return;
+              this.classList.add("mined");
+              createParticles(x + 32, y + 32);
+              dropXPOrb(x, y);
+              currentXPLevel++;
+              document.getElementById("levelCount").textContent =
+                currentXPLevel;
+              if (currentXPLevel >= startLevel + 9) {
+                document.getElementById("enchantContainer").style.display =
+                  "block";
+              }
+            };
+            area.appendChild(ore);
+          }
+        }
+      }
+
+      window.onload = () => {
+        spawnOres();
+        document.getElementById("year").textContent = new Date().getFullYear();
+        document.getElementById("splashText").textContent =
+          splashes[Math.floor(Math.random() * splashes.length)];
+      };
+
+      window.onscroll = function () {
+        const winScroll =
+          document.body.scrollTop || document.documentElement.scrollTop;
+        const height =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+        document.getElementById("xpFill").style.width =
+          (winScroll / height) * 100 + "%";
+      };
+    </script>
+  </body>
+</html>
