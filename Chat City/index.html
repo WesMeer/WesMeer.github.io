@@ -1,0 +1,1933 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Chat City</title>
+
+    <link
+      href="https://unpkg.com/nes.css@latest/css/nes.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =====================================================
+         GLOBAL
+         ===================================================== */
+
+      * {
+        box-sizing: border-box;
+        font-family: "Press Start 2P", system-ui;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        background-image: url("background.png");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center 0;
+        background-size: auto 108%;
+
+        font-family: "Press Start 2P", system-ui;
+      }
+
+      /* =====================================================
+         CANVAS
+         ===================================================== */
+
+      canvas {
+        position: absolute;
+
+        left: 0;
+        top: 75%;
+
+        width: 100%;
+        height: 25%;
+
+        display: block;
+
+        touch-action: none;
+
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+
+        cursor: default;
+      }
+
+      /* =====================================================
+         LOGIN SCREEN
+         ===================================================== */
+
+      #loginScreen {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 100;
+
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        background: rgba(0, 0, 0, 0.85);
+      }
+
+      #loginBox {
+        width: min(90%, 500px);
+
+        background: #fff;
+
+        color: #212529;
+      }
+
+      #loginBox p {
+        line-height: 1.8;
+      }
+
+      #loginBox .nes-field {
+        text-align: left;
+      }
+
+      #loginError {
+        display: none;
+
+        margin-top: 20px;
+      }
+
+      /* =====================================================
+         STATUS
+         ===================================================== */
+
+      #status {
+        position: fixed;
+
+        top: 15px;
+        left: 15px;
+
+        z-index: 20;
+
+        color: white;
+
+        text-shadow: 2px 2px #000;
+
+        font-size: 10px;
+
+        line-height: 1.5;
+
+        pointer-events: none;
+      }
+
+      /* =====================================================
+         CHANGE CHANNEL
+         ===================================================== */
+
+      #changeChannel {
+        position: fixed;
+
+        top: 15px;
+        right: 15px;
+
+        z-index: 20;
+
+        font-size: 10px;
+      }
+
+      /* =====================================================
+         SETTINGS MODAL
+         ===================================================== */
+
+      #settingsScreen {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 200;
+
+        display: none;
+
+        justify-content: center;
+        align-items: center;
+
+        background: rgba(0, 0, 0, 0.85);
+      }
+
+      #settingsBox {
+        width: min(90%, 550px);
+
+        background: white;
+
+        color: #212529;
+      }
+
+      #settingsBox p {
+        line-height: 1.8;
+      }
+
+      #settingsBox .nes-field {
+        text-align: left;
+      }
+
+      #settingsError {
+        display: none;
+
+        margin-top: 15px;
+      }
+
+      #settingsButtons {
+        display: flex;
+
+        gap: 12px;
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+      }
+
+      /* =====================================================
+         OBS CHECKBOX
+         ===================================================== */
+
+      .obs-setting {
+        text-align: left;
+
+        margin: 20px 0;
+      }
+
+      .obs-setting label {
+        cursor: pointer;
+      }
+
+      /* =====================================================
+         UI AUTO HIDE
+         ===================================================== */
+
+      #status,
+      #changeChannel {
+        transition:
+          opacity 0.5s ease,
+          visibility 0.5s ease;
+      }
+
+      body.ui-hidden #status,
+      body.ui-hidden #changeChannel {
+        opacity: 0;
+
+        visibility: hidden;
+
+        pointer-events: none;
+      }
+
+      /* =====================================================
+         OBS MODE
+         ===================================================== */
+
+      body.obs-mode {
+        background: transparent !important;
+        background-image: none !important;
+      }
+
+      /*
+         In OBS mode the normal status is hidden.
+         Change channel is NOT display:none,
+         because we want it to be able to appear
+         temporarily when the user moves the mouse.
+      */
+
+      body.obs-mode #status {
+        opacity: 0;
+
+        visibility: hidden;
+
+        pointer-events: none;
+      }
+
+      body.obs-mode #loginScreen {
+        display: none !important;
+      }
+
+      /*
+         Settings must still be able to open in OBS.
+      */
+
+      body.obs-mode #settingsScreen {
+        z-index: 300;
+      }
+
+      /* =====================================================
+         NES FONT
+         ===================================================== */
+
+      input,
+      button,
+      label,
+      p,
+      div,
+      span {
+        font-family: "Press Start 2P", system-ui;
+      }
+
+      /* =====================================================
+         MOBILE
+         ===================================================== */
+
+      @media (max-width: 600px) {
+        #changeChannel {
+          font-size: 8px;
+        }
+
+        #status {
+          font-size: 8px;
+        }
+
+        #loginBox,
+        #settingsBox {
+          max-height: 90vh;
+
+          overflow-y: auto;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- =====================================================
+         LOGIN SCREEN
+         ===================================================== -->
+
+    <div id="loginScreen">
+      <div id="loginBox" class="nes-container with-title is-centered">
+        <p class="title">Chat City</p>
+
+        <p>Choose the Twitch channel you want to see the chat from.</p>
+
+        <div class="nes-field">
+          <label for="channelInput"> Twitch Channel </label>
+
+          <input
+            id="channelInput"
+            type="text"
+            class="nes-input"
+            placeholder="wesmeer11"
+            autocomplete="off"
+          />
+        </div>
+
+        <br />
+
+        <button id="loginButton" class="nes-btn is-primary">
+          Login with Twitch
+        </button>
+
+        <p id="loginError" class="nes-text is-error"></p>
+      </div>
+    </div>
+
+    <!-- =====================================================
+         SETTINGS SCREEN
+         ===================================================== -->
+
+    <div id="settingsScreen">
+      <div id="settingsBox" class="nes-container with-title is-centered">
+        <p class="title">Settings</p>
+
+        <div class="nes-field">
+          <label for="settingsChannelInput"> Twitch Channel </label>
+
+          <input
+            id="settingsChannelInput"
+            type="text"
+            class="nes-input"
+            placeholder="wesmeer11"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- =================================================
+             OBS SETTING
+             ================================================= -->
+
+        <div class="obs-setting">
+          <label>
+            <input id="obsCheckbox" type="checkbox" class="nes-checkbox" />
+
+            <span> OBS Mode </span>
+          </label>
+
+          <p style="font-size: 9px; margin-top: 12px">
+            Makes the background transparent and automatically hides the
+            controls.
+          </p>
+        </div>
+
+        <!-- =================================================
+             SETTINGS BUTTONS
+             ================================================= -->
+
+        <div id="settingsButtons">
+          <button id="saveSettingsButton" class="nes-btn is-primary">
+            Save
+          </button>
+
+          <button id="closeSettingsButton" class="nes-btn">Cancel</button>
+        </div>
+
+        <p id="settingsError" class="nes-text is-error"></p>
+      </div>
+    </div>
+
+    <!-- =====================================================
+         STATUS
+         ===================================================== -->
+
+    <div id="status" class="nes-text is-success"></div>
+
+    <!-- =====================================================
+         CHANGE CHANNEL
+         ===================================================== -->
+
+    <button id="changeChannel" class="nes-btn is-warning">Settings</button>
+
+    <!-- =====================================================
+         SOUND
+         ===================================================== -->
+
+    <audio id="message" preload="auto">
+      <source src="message.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- =====================================================
+         CANVAS
+         ===================================================== -->
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+      // =====================================================
+      // TWITCH SETTINGS
+      // =====================================================
+
+      const CLIENT_ID = "t1uwlk3xd0z0lww65xi6ggoxq9lfhq";
+
+      const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+      // =====================================================
+      // SESSION SETTINGS
+      // =====================================================
+
+      /*
+         De sessie blijft maximaal 5 minuten bestaan.
+
+         BELANGRIJK:
+
+         De timer loopt NIET continu.
+
+         We controleren alleen wanneer de site
+         opnieuw geopend wordt.
+
+         Daardoor wordt iemand die de pagina
+         20 minuten open laat niet opeens
+         uitgelogd.
+      */
+
+      const SESSION_MAX_AGE = 5 * 60 * 1000;
+
+      const SESSION_TIME_KEY = "chat_city_session_time";
+
+      const CHANNEL_KEY = "chat_city_channel";
+
+      const TOKEN_KEY = "chat_city_token";
+
+      const OBS_KEY = "chat_city_obs";
+
+      // =====================================================
+      // URL
+      // =====================================================
+
+      const params = new URLSearchParams(window.location.search);
+
+      const channelFromUrl = params.get("channel");
+
+      const obsFromUrl = params.get("obs");
+
+      /*
+         ?obs=true
+         ?obs=1
+      */
+
+      const urlRequestsObs = obsFromUrl === "1" || obsFromUrl === "true";
+
+      // =====================================================
+      // ELEMENTS
+      // =====================================================
+
+      const canvas = document.querySelector("#canvas");
+
+      const ctx = canvas.getContext("2d");
+
+      const loginScreen = document.querySelector("#loginScreen");
+
+      const loginButton = document.querySelector("#loginButton");
+
+      const channelInput = document.querySelector("#channelInput");
+
+      const loginError = document.querySelector("#loginError");
+
+      const status = document.querySelector("#status");
+
+      const changeChannelButton = document.querySelector("#changeChannel");
+
+      const messageSound = document.querySelector("#message");
+
+      const settingsScreen = document.querySelector("#settingsScreen");
+
+      const settingsChannelInput = document.querySelector(
+        "#settingsChannelInput",
+      );
+
+      const obsCheckbox = document.querySelector("#obsCheckbox");
+
+      const saveSettingsButton = document.querySelector("#saveSettingsButton");
+
+      const closeSettingsButton = document.querySelector(
+        "#closeSettingsButton",
+      );
+
+      const settingsError = document.querySelector("#settingsError");
+
+      // =====================================================
+      // SESSION CHECK
+      // =====================================================
+
+      function checkSession() {
+        const savedTime = Number(localStorage.getItem(SESSION_TIME_KEY));
+
+        /*
+           Als er geen sessietijd is,
+           is dit een nieuwe sessie.
+        */
+
+        if (!savedTime) {
+          return false;
+        }
+
+        const age = Date.now() - savedTime;
+
+        /*
+           Sessie ouder dan 5 minuten?
+        */
+
+        if (age > SESSION_MAX_AGE) {
+          console.log("Chat City session expired.");
+
+          localStorage.removeItem(SESSION_TIME_KEY);
+
+          localStorage.removeItem(CHANNEL_KEY);
+
+          localStorage.removeItem(TOKEN_KEY);
+
+          localStorage.removeItem(OBS_KEY);
+
+          return false;
+        }
+
+        return true;
+      }
+
+      // =====================================================
+      // START SESSION
+      // =====================================================
+
+      /*
+         Alleen een nieuwe sessietijd maken
+         wanneer er nog geen sessie bestaat.
+      */
+
+      if (!checkSession()) {
+        localStorage.removeItem(CHANNEL_KEY);
+
+        localStorage.removeItem(TOKEN_KEY);
+
+        localStorage.removeItem(OBS_KEY);
+
+        localStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+      }
+
+      // =====================================================
+      // CHANNEL
+      // =====================================================
+
+      let twitchChannel = channelFromUrl || localStorage.getItem(CHANNEL_KEY);
+
+      if (twitchChannel) {
+        twitchChannel = twitchChannel.trim().toLowerCase();
+      }
+
+      // =====================================================
+      // OBS MODE
+      // =====================================================
+
+      let obsMode = urlRequestsObs || localStorage.getItem(OBS_KEY) === "true";
+
+      function applyObsMode() {
+        if (obsMode) {
+          document.body.classList.add("obs-mode");
+        } else {
+          document.body.classList.remove("obs-mode");
+        }
+      }
+
+      applyObsMode();
+
+      // =====================================================
+      // TOKEN FROM URL
+      // =====================================================
+
+      function getTokenFromUrl() {
+        const hash = window.location.hash.substring(1);
+
+        const hashParams = new URLSearchParams(hash);
+
+        return hashParams.get("access_token");
+      }
+
+      let accessToken = getTokenFromUrl();
+
+      // =====================================================
+      // SAVE TOKEN
+      // =====================================================
+
+      if (accessToken) {
+        localStorage.setItem(TOKEN_KEY, accessToken);
+
+        /*
+           Session opnieuw markeren.
+           
+           De OAuth redirect is onderdeel
+           van dezelfde sessie.
+        */
+
+        localStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+
+        /*
+           Token uit de URL verwijderen.
+        */
+
+        history.replaceState(
+          null,
+          "",
+          window.location.pathname +
+            (channelFromUrl
+              ? "?channel=" + encodeURIComponent(twitchChannel || "")
+              : ""),
+        );
+
+        accessToken = localStorage.getItem(TOKEN_KEY);
+      } else {
+        accessToken = localStorage.getItem(TOKEN_KEY);
+      }
+
+      // =====================================================
+      // SAVE CHANNEL FROM URL
+      // =====================================================
+
+      if (channelFromUrl) {
+        localStorage.setItem(CHANNEL_KEY, twitchChannel);
+      }
+
+      // =====================================================
+      // LOGIN SCREEN
+      // =====================================================
+
+      function showLoginScreen() {
+        /*
+           OBS mag nooit het loginformulier
+           laten zien.
+        */
+
+        if (obsMode) {
+          return;
+        }
+
+        settingsScreen.style.display = "none";
+
+        loginScreen.style.display = "flex";
+
+        changeChannelButton.style.display = "none";
+
+        if (twitchChannel) {
+          channelInput.value = twitchChannel;
+        }
+
+        setTimeout(() => {
+          channelInput.focus();
+        }, 100);
+      }
+
+      function hideLoginScreen() {
+        loginScreen.style.display = "none";
+
+        changeChannelButton.style.display = "block";
+      }
+
+      // =====================================================
+      // SETTINGS
+      // =====================================================
+
+      function openSettings() {
+        /*
+           Settings mogen ook in OBS mode
+           geopend worden.
+        */
+
+        settingsChannelInput.value = twitchChannel || "";
+
+        obsCheckbox.checked = obsMode;
+
+        settingsError.style.display = "none";
+
+        settingsScreen.style.display = "flex";
+
+        /*
+           UI zichtbaar maken.
+        */
+
+        document.body.classList.remove("ui-hidden");
+
+        clearTimeout(uiHideTimer);
+      }
+
+      function closeSettings() {
+        settingsScreen.style.display = "none";
+
+        /*
+           Na sluiten UI timer opnieuw starten.
+        */
+
+        showUI();
+      }
+
+      changeChannelButton.addEventListener("click", () => {
+        openSettings();
+      });
+
+      closeSettingsButton.addEventListener("click", () => {
+        closeSettings();
+      });
+
+      // =====================================================
+      // SAVE SETTINGS
+      // =====================================================
+
+      saveSettingsButton.addEventListener("click", () => {
+        const newChannel = settingsChannelInput.value.trim().toLowerCase();
+
+        /*
+             Channel controleren.
+          */
+
+        if (!newChannel) {
+          settingsError.textContent = "Please enter a Twitch channel.";
+
+          settingsError.style.display = "block";
+
+          return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(newChannel)) {
+          settingsError.textContent =
+            "Use only letters, numbers and underscores.";
+
+          settingsError.style.display = "block";
+
+          return;
+        }
+
+        settingsError.style.display = "none";
+
+        /*
+             Nieuwe instellingen.
+          */
+
+        const newObsMode = obsCheckbox.checked;
+
+        const channelChanged = newChannel !== twitchChannel;
+
+        twitchChannel = newChannel;
+
+        obsMode = newObsMode;
+
+        /*
+             Opslaan.
+          */
+
+        localStorage.setItem(CHANNEL_KEY, twitchChannel);
+
+        localStorage.setItem(OBS_KEY, obsMode ? "true" : "false");
+
+        /*
+             De sessie blijft vanaf dit moment
+             maximaal 5 minuten geldig bij
+             een volgende page load.
+          */
+
+        localStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+
+        /*
+             OBS mode direct toepassen.
+          */
+
+        applyObsMode();
+
+        /*
+             Settings sluiten.
+          */
+
+        settingsScreen.style.display = "none";
+
+        /*
+             Als er nog geen Twitch token is,
+             moeten we eerst inloggen.
+          */
+
+        if (!accessToken) {
+          if (obsMode) {
+            /*
+                 OBS mode tijdelijk uitzetten
+                 zodat login zichtbaar kan zijn.
+              */
+
+            obsMode = false;
+
+            applyObsMode();
+
+            localStorage.setItem(OBS_KEY, "false");
+          }
+
+          showLoginScreen();
+
+          return;
+        }
+
+        /*
+             Als het kanaal veranderd is,
+             opnieuw verbinden.
+          */
+
+        if (channelChanged) {
+          players.clear();
+
+          reconnectToTwitch();
+        }
+
+        /*
+             UI tonen.
+          */
+
+        showUI();
+      });
+
+      // =====================================================
+      // LOGIN
+      // =====================================================
+
+      function loginWithTwitch() {
+        const channel = channelInput.value.trim().toLowerCase();
+
+        if (!channel) {
+          loginError.textContent = "Please enter a Twitch channel.";
+
+          loginError.style.display = "block";
+
+          return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(channel)) {
+          loginError.textContent = "Use only letters, numbers and underscores.";
+
+          loginError.style.display = "block";
+
+          return;
+        }
+
+        loginError.style.display = "none";
+
+        twitchChannel = channel;
+
+        /*
+           Session opslaan.
+        */
+
+        localStorage.setItem(CHANNEL_KEY, twitchChannel);
+
+        localStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+
+        /*
+           OAuth login.
+        */
+
+        const scopes = "chat:read";
+
+        const url =
+          "https://id.twitch.tv/oauth2/authorize" +
+          "?response_type=token" +
+          "&client_id=" +
+          encodeURIComponent(CLIENT_ID) +
+          "&redirect_uri=" +
+          encodeURIComponent(REDIRECT_URI) +
+          "&scope=" +
+          encodeURIComponent(scopes);
+
+        window.location.href = url;
+      }
+
+      loginButton.addEventListener("click", loginWithTwitch);
+
+      channelInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          loginWithTwitch();
+        }
+      });
+
+      settingsChannelInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          saveSettingsButton.click();
+        }
+
+        if (event.key === "Escape") {
+          closeSettings();
+        }
+      });
+
+      // =====================================================
+      // UI AUTO HIDE
+      // =====================================================
+
+      let uiHideTimer = null;
+
+      function showUI() {
+        /*
+           Settings zelf moet altijd zichtbaar
+           blijven.
+        */
+
+        if (settingsScreen.style.display === "flex") {
+          return;
+        }
+
+        document.body.classList.remove("ui-hidden");
+
+        clearTimeout(uiHideTimer);
+
+        /*
+           Na 5 seconden verbergen.
+
+           Dit werkt óók in OBS mode.
+        */
+
+        uiHideTimer = setTimeout(() => {
+          document.body.classList.add("ui-hidden");
+        }, 5000);
+      }
+
+      /*
+         UI bij eerste openen 5 seconden tonen.
+      */
+
+      showUI();
+
+      /*
+         Bewegen van de muis maakt de UI
+         weer zichtbaar.
+
+         Dit werkt bewust ook in OBS mode.
+      */
+
+      window.addEventListener("mousemove", showUI);
+
+      window.addEventListener("pointermove", showUI);
+
+      window.addEventListener("pointerdown", showUI);
+
+      // =====================================================
+      // CANVAS
+      // =====================================================
+
+      function resizeCanvas() {
+        const width = window.innerWidth;
+
+        const height = Math.floor(window.innerHeight * 0.25);
+
+        /*
+           Device pixel ratio.
+
+           Maximaal 2 om onnodig zware
+           canvassen te voorkomen.
+        */
+
+        const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+
+        /*
+           Interne resolutie.
+        */
+
+        canvas.width = Math.round(width * dpr);
+
+        canvas.height = Math.round(height * dpr);
+
+        /*
+           CSS grootte.
+        */
+
+        canvas.style.width = width + "px";
+
+        canvas.style.height = height + "px";
+
+        /*
+           Alle game-coördinaten blijven
+           in CSS pixels werken.
+        */
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        ctx.imageSmoothingEnabled = false;
+      }
+
+      resizeCanvas();
+
+      window.addEventListener("resize", resizeCanvas);
+
+      // =====================================================
+      // SPRITESHEET
+      // =====================================================
+
+      const image = new Image();
+
+      image.src = "spritesheet.png";
+
+      const sprites = [
+        {
+          x: 7,
+          y: 55,
+          width: 10,
+          height: 17,
+        },
+
+        {
+          x: 29,
+          y: 55,
+          width: 13,
+          height: 17,
+        },
+
+        {
+          x: 55,
+          y: 55,
+          width: 10,
+          height: 17,
+        },
+
+        {
+          x: 77,
+          y: 55,
+          width: 11,
+          height: 17,
+        },
+      ];
+
+      // =====================================================
+      // SKIN COLORS
+      // =====================================================
+
+      /*
+   Originele kleuren uit de spritesheet:
+
+   Huid      = #FBF3E9
+   Schaduw   = #B9B3A1
+   Oor       = #E6D5C6
+
+   Iedere speler krijgt willekeurig één
+   huidskleur-profiel.
+*/
+
+      const skinColors = [
+        {
+          skin: "#FBF3E9",
+          shadow: "#B9B3A1",
+          ear: "#E6D5C6",
+        },
+
+        {
+          skin: "#F2D3B1",
+          shadow: "#C49F7A",
+          ear: "#DDBB9A",
+        },
+
+        {
+          skin: "#E8B88A",
+          shadow: "#B9855F",
+          ear: "#D29B73",
+        },
+
+        {
+          skin: "#D99A6C",
+          shadow: "#A96F4B",
+          ear: "#C8875F",
+        },
+
+        {
+          skin: "#C98255",
+          shadow: "#925638",
+          ear: "#B86D46",
+        },
+
+        {
+          skin: "#A9653E",
+          shadow: "#75432F",
+          ear: "#94563A",
+        },
+
+        {
+          skin: "#8B542F",
+          shadow: "#603A27",
+          ear: "#79472B",
+        },
+
+        {
+          skin: "#70412B",
+          shadow: "#4B2D20",
+          ear: "#623824",
+        },
+
+        {
+          skin: "#0fa4fa",
+          shadow: "#174e6d",
+          ear: "#2089c5",
+        },
+      ];
+
+      function getRandomSkinColor() {
+        return skinColors[Math.floor(Math.random() * skinColors.length)];
+      }
+
+      // =====================================================
+      // PLAYERS
+      // =====================================================
+
+      const players = new Map();
+
+      function addPlayer(username) {
+        if (players.has(username)) {
+          return;
+        }
+
+        const player = {
+          name: username,
+
+          x: Math.random() * Math.max(0, window.innerWidth - 70),
+
+          /*
+             Y is vast.
+
+             Alleen X kan veranderen
+             tijdens draggen.
+          */
+
+          y: 50,
+
+          message: "",
+
+          messageTime: 0,
+
+          direction: Math.random() < 0.5 ? -1 : 1,
+
+          currentFrame: 0,
+
+          lastFrameTime: 0,
+
+          frameDuration: 150,
+
+          speed: 1,
+
+          scale: 5,
+
+          dragging: false,
+
+          skin: getRandomSkinColor(),
+        };
+
+        players.set(username, player);
+
+        console.log("New chat member:", username, "Skin:", player.skinColor);
+      }
+
+      // =====================================================
+      // DRAGGING
+      // =====================================================
+
+      let draggedPlayer = null;
+
+      let dragOffsetX = 0;
+
+      let lastDragX = 0;
+
+      // =====================================================
+      // GET PLAYER AT POSITION
+      // =====================================================
+
+      function getPlayerAtPosition(pointerX, pointerY) {
+        /*
+           Reverse zodat het laatst getekende
+           poppetje eerst wordt gecontroleerd.
+        */
+
+        const playerList = Array.from(players.values()).reverse();
+
+        for (const player of playerList) {
+          const sprite = sprites[player.currentFrame];
+
+          const drawWidth = sprite.width * player.scale;
+
+          const drawHeight = sprite.height * player.scale;
+
+          if (
+            pointerX >= player.x &&
+            pointerX <= player.x + drawWidth &&
+            pointerY >= player.y &&
+            pointerY <= player.y + drawHeight
+          ) {
+            return player;
+          }
+        }
+
+        return null;
+      }
+
+      // =====================================================
+      // POINTER DOWN
+      // =====================================================
+
+      canvas.addEventListener("pointerdown", (event) => {
+        const rect = canvas.getBoundingClientRect();
+
+        const pointerX = event.clientX - rect.left;
+
+        const pointerY = event.clientY - rect.top;
+
+        const player = getPlayerAtPosition(pointerX, pointerY);
+
+        if (!player) {
+          return;
+        }
+
+        draggedPlayer = player;
+
+        /*
+             Alleen X offset bewaren.
+          */
+
+        dragOffsetX = pointerX - player.x;
+
+        lastDragX = pointerX;
+
+        player.dragging = true;
+
+        /*
+             Pointer capture zorgt ervoor
+             dat draggen blijft werken als
+             de muis buiten canvas komt.
+          */
+
+        canvas.setPointerCapture(event.pointerId);
+
+        event.preventDefault();
+      });
+
+      // =====================================================
+      // POINTER MOVE
+      // =====================================================
+
+      canvas.addEventListener("pointermove", (event) => {
+        if (!draggedPlayer) {
+          return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+
+        const pointerX = event.clientX - rect.left;
+
+        /*
+             Kijkrichting.
+
+             Alleen veranderen als de
+             muis daadwerkelijk beweegt.
+          */
+
+        if (pointerX > lastDragX) {
+          draggedPlayer.direction = 1;
+        } else if (pointerX < lastDragX) {
+          draggedPlayer.direction = -1;
+        }
+
+        /*
+             ALLEEN X veranderen.
+          */
+
+        draggedPlayer.x = pointerX - dragOffsetX;
+
+        const sprite = sprites[draggedPlayer.currentFrame];
+
+        const drawWidth = sprite.width * draggedPlayer.scale;
+
+        /*
+             Binnen canvas houden.
+          */
+
+        draggedPlayer.x = Math.max(
+          0,
+          Math.min(draggedPlayer.x, window.innerWidth - drawWidth),
+        );
+
+        lastDragX = pointerX;
+
+        event.preventDefault();
+      });
+
+      // =====================================================
+      // POINTER UP
+      // =====================================================
+
+      function stopDragging(event) {
+        if (!draggedPlayer) {
+          return;
+        }
+
+        draggedPlayer.dragging = false;
+
+        draggedPlayer = null;
+
+        if (event && canvas.hasPointerCapture(event.pointerId)) {
+          canvas.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      canvas.addEventListener("pointerup", stopDragging);
+
+      canvas.addEventListener("pointercancel", stopDragging);
+
+      // =====================================================
+      // TWITCH IRC
+      // =====================================================
+
+      let twitchSocket = null;
+
+      function disconnectFromTwitch() {
+        if (twitchSocket) {
+          try {
+            twitchSocket.close();
+          } catch (error) {
+            console.log("Couldn't close Twitch socket:", error);
+          }
+
+          twitchSocket = null;
+        }
+      }
+
+      function reconnectToTwitch() {
+        disconnectFromTwitch();
+
+        /*
+           Kleine delay zodat de oude socket
+           tijd krijgt om te sluiten.
+        */
+
+        setTimeout(() => {
+          connectToTwitch();
+        }, 100);
+      }
+
+      function connectToTwitch() {
+        if (!accessToken) {
+          status.textContent = "Log in with Twitch first.";
+
+          showLoginScreen();
+
+          return;
+        }
+
+        if (!twitchChannel) {
+          showLoginScreen();
+
+          return;
+        }
+
+        /*
+           OBS status wordt niet permanent
+           zichtbaar gemaakt.
+        */
+
+        status.textContent = "Connecting to Twitch...";
+
+        twitchSocket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
+
+        twitchSocket.onopen = () => {
+          console.log("Connected to Twitch IRC");
+
+          twitchSocket.send("CAP REQ :twitch.tv/tags twitch.tv/commands\r\n");
+
+          twitchSocket.send("PASS oauth:" + accessToken + "\r\n");
+
+          twitchSocket.send("NICK chatcity\r\n");
+
+          twitchSocket.send("JOIN #" + twitchChannel + "\r\n");
+        };
+
+        twitchSocket.onmessage = (event) => {
+          const messages = event.data.split("\r\n");
+
+          for (const message of messages) {
+            if (!message) {
+              continue;
+            }
+
+            // =================================================
+            // PING
+            // =================================================
+
+            if (message.startsWith("PING")) {
+              twitchSocket.send("PONG :tmi.twitch.tv\r\n");
+
+              continue;
+            }
+
+            console.log("Twitch:", message);
+
+            // =================================================
+            // CHAT MESSAGE
+            // =================================================
+
+            if (message.includes(" PRIVMSG ")) {
+              const match = message.match(/display-name=([^;]*)/);
+
+              if (!match) {
+                continue;
+              }
+
+              const username = match[1];
+
+              const messageMatch = message.match(/ PRIVMSG #[^ ]+ :(.*)$/);
+
+              const chatMessage = messageMatch ? messageMatch[1] : "";
+
+              console.log(username + ":", chatMessage);
+
+              if (!players.has(username)) {
+                addPlayer(username);
+              }
+
+              const player = players.get(username);
+
+              player.message = chatMessage;
+
+              player.messageTime = Date.now();
+
+              // =================================================
+              // SOUND
+              // =================================================
+
+              messageSound.currentTime = 0;
+
+              messageSound.play().catch((error) => {
+                console.log("Couldn't play sound:", error);
+              });
+            }
+
+            // =================================================
+            // LOGIN ERROR
+            // =================================================
+
+            if (message.includes("Login authentication failed")) {
+              console.error("Twitch token disallowed.");
+
+              localStorage.removeItem(TOKEN_KEY);
+
+              accessToken = null;
+
+              status.textContent = "Twitch login timeout. Try again.";
+
+              showLoginScreen();
+            }
+
+            // =================================================
+            // JOIN
+            // =================================================
+
+            if (message.includes(" JOIN #")) {
+              status.textContent = "Connected to #" + twitchChannel;
+
+              hideLoginScreen();
+
+              showUI();
+            }
+          }
+        };
+
+        twitchSocket.onerror = (error) => {
+          console.error("Twitch WebSocket error:", error);
+
+          status.textContent = "Twitch connection failed.";
+
+          showUI();
+        };
+
+        twitchSocket.onclose = () => {
+          console.log("Twitch connection closed.");
+
+          /*
+               Alleen status tonen als we
+               niet bewust aan het reconnecten
+               zijn.
+            */
+
+          if (twitchSocket) {
+            status.textContent = "Twitch connection closed.";
+          }
+        };
+      }
+
+      // =====================================================
+      // DRAWING
+      // =====================================================
+
+      /*
+         Offscreen canvas voor skin colors.
+
+         Iedere sprite is maar ongeveer
+         10x17 pixels, dus dit is heel licht.
+      */
+
+      const skinCanvas = document.createElement("canvas");
+
+      const skinCtx = skinCanvas.getContext("2d");
+
+      skinCtx.imageSmoothingEnabled = false;
+
+      // =====================================================
+      // HEX -> RGB
+      // =====================================================
+
+      function hexToRgb(hex) {
+        const value = hex.replace("#", "");
+
+        return {
+          r: parseInt(value.substring(0, 2), 16),
+
+          g: parseInt(value.substring(2, 4), 16),
+
+          b: parseInt(value.substring(4, 6), 16),
+        };
+      }
+
+      // =====================================================
+      // DRAW SKIN OVERLAY
+      // =====================================================
+
+      function drawSkinOverlay(player, sprite, drawWidth, drawHeight) {
+        skinCanvas.width = sprite.width;
+        skinCanvas.height = sprite.height;
+
+        skinCtx.clearRect(0, 0, sprite.width, sprite.height);
+
+        skinCtx.imageSmoothingEnabled = false;
+
+        // ==============================================
+        // SPRITE OP OFFSCREEN CANVAS
+        // ==============================================
+
+        skinCtx.drawImage(
+          image,
+          sprite.x,
+          sprite.y,
+          sprite.width,
+          sprite.height,
+          0,
+          0,
+          sprite.width,
+          sprite.height,
+        );
+
+        // ==============================================
+        // KLEURFILTER
+        // ==============================================
+
+        /*
+     We gebruiken de originele huidkleur
+     als masker.
+
+     Hierdoor worden alleen pixels die
+     bij de huid horen gekleurd.
+  */
+
+        const pixels = skinCtx.getImageData(0, 0, sprite.width, sprite.height);
+
+        const data = pixels.data;
+
+        const skinColor = hexToRgb(player.skin.skin);
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const a = data[i + 3];
+
+          if (a === 0) {
+            continue;
+          }
+
+          /*
+       De originele huid is licht/beige.
+
+       We pakken alle pixels die voldoende
+       dicht bij de originele huidkleur zitten.
+    */
+
+          const skinDifference =
+            Math.abs(r - 251) + Math.abs(g - 243) + Math.abs(b - 233);
+
+          const shadowDifference =
+            Math.abs(r - 185) + Math.abs(g - 179) + Math.abs(b - 161);
+
+          const earDifference =
+            Math.abs(r - 230) + Math.abs(g - 213) + Math.abs(b - 198);
+
+          /*
+       Huid
+    */
+
+          if (skinDifference < 100) {
+            data[i] = skinColor.r;
+            data[i + 1] = skinColor.g;
+            data[i + 2] = skinColor.b;
+          } else if (shadowDifference < 100) {
+            /*
+       Schaduw
+
+       We maken de schaduw automatisch
+       donkerder dan de gekozen huidkleur.
+    */
+            data[i] = Math.max(0, skinColor.r * 0.72);
+            data[i + 1] = Math.max(0, skinColor.g * 0.72);
+            data[i + 2] = Math.max(0, skinColor.b * 0.72);
+          } else if (earDifference < 100) {
+            /*
+       Oor
+
+       Iets donkerder dan de normale huid.
+    */
+            data[i] = Math.max(0, skinColor.r * 0.88);
+            data[i + 1] = Math.max(0, skinColor.g * 0.88);
+            data[i + 2] = Math.max(0, skinColor.b * 0.88);
+          }
+        }
+
+        skinCtx.putImageData(pixels, 0, 0);
+
+        // ==============================================
+        // SPRITE TEKENEN
+        // ==============================================
+
+        ctx.save();
+
+        if (player.direction === -1) {
+          ctx.translate(player.x + drawWidth, player.y);
+
+          ctx.scale(-1, 1);
+
+          ctx.drawImage(
+            skinCanvas,
+            0,
+            0,
+            sprite.width,
+            sprite.height,
+            0,
+            0,
+            drawWidth,
+            drawHeight,
+          );
+        } else {
+          ctx.drawImage(
+            skinCanvas,
+            0,
+            0,
+            sprite.width,
+            sprite.height,
+            player.x,
+            player.y,
+            drawWidth,
+            drawHeight,
+          );
+        }
+
+        ctx.restore();
+      }
+
+      // =====================================================
+      // DRAW PLAYER
+      // =====================================================
+
+      function drawPlayer(player) {
+        const sprite = sprites[player.currentFrame];
+
+        const drawWidth = sprite.width * player.scale;
+
+        const drawHeight = sprite.height * player.scale;
+
+        const centerX = player.x + drawWidth / 2;
+
+        // =================================================
+        // CHAT BUBBLE
+        // =================================================
+
+        if (player.message && Date.now() - player.messageTime < 5000) {
+          /*
+             BELANGRIJK:
+
+             Font wordt hier expliciet gezet
+             omdat canvas zijn eigen font gebruikt.
+          */
+
+          ctx.font = "10px 'Press Start 2P'";
+
+          ctx.textAlign = "center";
+
+          ctx.textBaseline = "middle";
+
+          let displayMessage = player.message;
+
+          const maxTextWidth = 280;
+
+          /*
+             Eerst meten.
+          */
+
+          if (ctx.measureText(displayMessage).width > maxTextWidth) {
+            while (
+              ctx.measureText(displayMessage + "...").width > maxTextWidth &&
+              displayMessage.length > 0
+            ) {
+              displayMessage = displayMessage.slice(0, -1);
+            }
+
+            displayMessage += "...";
+          }
+
+          const messageWidth = ctx.measureText(displayMessage).width;
+
+          const bubbleWidth = Math.min(messageWidth + 20, 300);
+
+          const bubbleHeight = 30;
+
+          const bubbleX = centerX - bubbleWidth / 2;
+
+          const bubbleY = player.y - 52;
+
+          // Background
+
+          ctx.fillStyle = "white";
+
+          ctx.fillRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight);
+
+          // Tail
+
+          ctx.beginPath();
+
+          ctx.moveTo(centerX - 6, bubbleY + bubbleHeight);
+
+          ctx.lineTo(centerX, bubbleY + bubbleHeight + 7);
+
+          ctx.lineTo(centerX + 6, bubbleY + bubbleHeight);
+
+          ctx.closePath();
+
+          ctx.fill();
+
+          // Text
+
+          ctx.fillStyle = "black";
+
+          ctx.fillText(displayMessage, centerX, bubbleY + bubbleHeight / 2);
+        }
+
+        // =================================================
+        // NAMETAG
+        // =================================================
+
+        ctx.font = "8px 'Press Start 2P'";
+
+        ctx.textAlign = "center";
+
+        ctx.textBaseline = "middle";
+
+        const textWidth = ctx.measureText(player.name).width;
+
+        const nameTagHeight = 18;
+
+        const nameTagY = player.y - 24;
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+
+        ctx.fillRect(
+          centerX - textWidth / 2 - 5,
+
+          nameTagY,
+
+          textWidth + 10,
+
+          nameTagHeight,
+        );
+
+        ctx.fillStyle = "white";
+
+        ctx.fillText(
+          player.name,
+
+          centerX,
+
+          nameTagY + nameTagHeight / 2,
+        );
+
+        // =================================================
+        // SPRITE
+        // =================================================
+
+        /*
+           We tekenen de sprite via
+           drawSkinOverlay.
+
+           Die functie tekent zowel
+           de originele sprite als
+           de skin overlay.
+        */
+
+        drawSkinOverlay(player, sprite, drawWidth, drawHeight);
+      }
+
+      // =====================================================
+      // UPDATE PLAYER
+      // =====================================================
+
+      function updatePlayer(player, timestamp) {
+        /*
+           Niet automatisch bewegen
+           tijdens draggen.
+        */
+
+        if (player.dragging) {
+          return;
+        }
+
+        player.x += player.speed * player.direction;
+
+        // =================================================
+        // ANIMATION
+        // =================================================
+
+        if (timestamp - player.lastFrameTime >= player.frameDuration) {
+          player.currentFrame++;
+
+          if (player.currentFrame >= sprites.length) {
+            player.currentFrame = 0;
+          }
+
+          player.lastFrameTime = timestamp;
+        }
+
+        const sprite = sprites[player.currentFrame];
+
+        const drawWidth = sprite.width * player.scale;
+
+        // =================================================
+        // RIGHT BORDER
+        // =================================================
+
+        if (player.x + drawWidth >= window.innerWidth) {
+          player.x = window.innerWidth - drawWidth;
+
+          player.direction = -1;
+        }
+
+        // =================================================
+        // LEFT BORDER
+        // =================================================
+
+        if (player.x <= 0) {
+          player.x = 0;
+
+          player.direction = 1;
+        }
+      }
+
+      // =====================================================
+      // ANIMATION LOOP
+      // =====================================================
+
+      function animate(timestamp) {
+        /*
+           Canvas in CSS-pixels
+           schoonmaken.
+        */
+
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight * 0.25);
+
+        for (const player of players.values()) {
+          updatePlayer(player, timestamp);
+
+          drawPlayer(player);
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      // =====================================================
+      // START
+      // =====================================================
+
+      image.onload = () => {
+        /*
+           Als er een kanaal + token is,
+           meteen verbinden.
+        */
+
+        if (accessToken && twitchChannel) {
+          hideLoginScreen();
+
+          connectToTwitch();
+        } else {
+          /*
+             Geen actieve sessie:
+             formulier laten zien.
+          */
+
+          showLoginScreen();
+        }
+
+        requestAnimationFrame(animate);
+      };
+    </script>
+  </body>
+</html>
